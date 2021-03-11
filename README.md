@@ -1,0 +1,1 @@
+# Blueshift-Cordova-Plugin

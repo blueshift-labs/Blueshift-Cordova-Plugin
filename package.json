@@ -1,0 +1,27 @@
+{
+  "name": "blueshift-cordova-plugin",
+  "version": "0.0.1",
+  "description": "Blueshift Cordova Plugin",
+  "cordova": {
+    "id": "blueshift-cordova-plugin",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blueshift-labs/Blueshift-Cordova-Plugin.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "author": "Blueshift",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blueshift-labs/Blueshift-Cordova-Plugin/issues"
+  },
+  "homepage": "https://github.com/blueshift-labs/Blueshift-Cordova-Plugin#readme"
+}
