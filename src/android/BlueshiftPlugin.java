@@ -28,7 +28,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        Log.d(TAG, "{\"action\":\"" + action +"\"}");
+        Log.d(TAG, "{\"action\":\"" + action + "\"}");
 
         // IN APP MESSAGES
         if (action.equals("registerForInAppMessages")) return registerForInAppMessages(args);
@@ -110,7 +110,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean trackCustomEvent(JSONArray args) throws JSONException {
         String eventName = args.getString(0);
-        JSONObject extras = args.getJSONObject(1);
+        JSONObject extras = getJSONObject(args, 1);
         boolean canBatch = args.getBoolean(2);
 
         Log.d(TAG, "trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
@@ -122,7 +122,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean identify(JSONArray args) throws JSONException {
         String eventName = "identify";
-        JSONObject extras = args.getJSONObject(0);
+        JSONObject extras = getJSONObject(args, 0);
         boolean canBatch = args.getBoolean(1);
 
         Log.d(TAG, "identify: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
@@ -189,7 +189,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean setUserInfoExtras(JSONArray args) throws JSONException {
-        JSONObject extras = args.getJSONObject(0);
+        JSONObject extras = getJSONObject(args, 0);
 
         Log.d(TAG, "setUserInfoExtras: " + extras);
 
@@ -216,7 +216,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean getLiveContentByEmail(JSONArray args, CallbackContext callbackContext) throws JSONException {
         String slotName = args.getString(0);
-        JSONObject liveContentContext = args.getJSONObject(1);
+        JSONObject liveContentContext = getJSONObject(args, 1);
 
         Log.d(TAG, "getLiveContentByEmail: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
@@ -227,7 +227,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean getLiveContentByCustomerID(JSONArray args, CallbackContext callbackContext) throws JSONException {
         String slotName = args.getString(0);
-        JSONObject liveContentContext = args.getJSONObject(1);
+        JSONObject liveContentContext = getJSONObject(args, 1);
 
         Log.d(TAG, "getLiveContentByCustomerID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
@@ -238,7 +238,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean getLiveContentByDeviceID(JSONArray args, CallbackContext callbackContext) throws JSONException {
         String slotName = args.getString(0);
-        JSONObject liveContentContext = args.getJSONObject(1);
+        JSONObject liveContentContext = getJSONObject(args, 1);
 
         Log.d(TAG, "getLiveContentByDeviceID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
@@ -278,6 +278,18 @@ public class BlueshiftPlugin extends CordovaPlugin {
         // TODO implement this
 
         return true;
+    }
+
+    JSONObject getJSONObject(JSONArray jsonArray, int index) {
+        if (jsonArray != null && index >= 0) {
+            try {
+                return jsonArray.getJSONObject(0);
+            } catch (Exception e) {
+                Log.e(TAG, "getJSONObject: ", e);
+            }
+        }
+
+        return null;
     }
 
     HashMap<String, Object> getMap(JSONObject jsonObject) {
