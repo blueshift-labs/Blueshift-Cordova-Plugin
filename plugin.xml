@@ -12,7 +12,8 @@
                 <param name="ios-package" value="Blueshift" />
             </feature>
         </config-file>
-        <source-file src="src/ios/Blueshift.m" />
+        <source-file src="src/ios/BlueshiftCordova.h" />
+        <source-file src="src/ios/BlueshiftCordova.m" />
         <podspec>
           <config>
             <source url="https://github.com/CocoaPods/Specs.git"/>
