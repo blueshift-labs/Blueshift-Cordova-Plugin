@@ -43,8 +43,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
         // USER INFO
         if (action.equals("setUserInfoEmailID")) return setUserInfoEmailID(args);
         if (action.equals("setUserInfoCustomerID")) return setUserInfoCustomerID(args);
-        if (action.equals("setUserInfoFirstname")) return setUserInfoFirstname(args);
-        if (action.equals("setUserInfoLastname")) return setUserInfoLastname(args);
+        if (action.equals("setUserInfoFirstName")) return setUserInfoFirstName(args);
+        if (action.equals("setUserInfoLastName")) return setUserInfoLastName(args);
         if (action.equals("setUserInfoExtras")) return setUserInfoExtras(args);
         if (action.equals("removeUserInfo")) return removeUserInfo();
 
@@ -160,7 +160,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
-    private boolean setUserInfoFirstname(JSONArray args) throws JSONException {
+    private boolean setUserInfoFirstName(JSONArray args) throws JSONException {
         String firstName = args.getString(0);
 
         Log.d(TAG, "setUserInfoFirstname: " + firstName);
@@ -174,7 +174,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
-    private boolean setUserInfoLastname(JSONArray args) throws JSONException {
+    private boolean setUserInfoLastName(JSONArray args) throws JSONException {
         String lastName = args.getString(0);
 
         Log.d(TAG, "setUserInfoLastname: " + lastName);
