@@ -2,6 +2,7 @@ package com.blueshift.cordova;
 
 import android.util.Log;
 
+import com.blueshift.Blueshift;
 import com.blueshift.BlueshiftAppPreferences;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.UserInfo;
@@ -18,15 +19,15 @@ import java.util.Iterator;
 /**
  * This class echoes a string called from JavaScript.
  */
-public class Blueshift extends CordovaPlugin {
+public class BlueshiftPlugin extends CordovaPlugin {
     
-    private com.blueshift.Blueshift getBlueshiftInstance() {
-        return com.blueshift.Blueshift.getInstance(cordova.getContext());
+    private Blueshift getBlueshiftInstance() {
+        return Blueshift.getInstance(cordova.getContext());
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        Log.d("Blueshift", action);
+        Log.d("Blueshift", "Action: " + action);
         
         // IN APP MESSAGES
         if (action.equals("registerForInAppMessages")) return registerForInAppMessages(args);
@@ -213,10 +214,10 @@ public class Blueshift extends CordovaPlugin {
     private boolean enableTracking(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
         if (args.length() == 1) {
-            com.blueshift.Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled);
+            Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled);
         } else if (args.length() == 2) {
             boolean wipeData = args.getBoolean(1);
-            com.blueshift.Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled, wipeData);
+            Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled, wipeData);
         }
 
         return true;

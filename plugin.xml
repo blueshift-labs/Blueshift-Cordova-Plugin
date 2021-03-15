@@ -26,11 +26,11 @@
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="Blueshift">
-                <param name="android-package" value="com.blueshift.cordova.Blueshift" />
+                <param name="android-package" value="com.blueshift.cordova.BlueshiftPlugin" />
             </feature>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
-        <source-file src="src/android/Blueshift.java" target-dir="src/com/blueshift/cordova" />
+        <source-file src="src/android/BlueshiftPlugin.java" target-dir="src/com/blueshift/cordova" />
         <framework src="com.blueshift:android-sdk:3.1.10"/>
     </platform>
 </plugin>
