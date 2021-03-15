@@ -54,6 +54,127 @@ exports.identify = function (extras, canBatch) {
     exec(null, null, 'Blueshift', 'identify', [extras, canBatch]);
 };
 
-// exports.coolMethod = function (arg0, success, error) {
-//     exec(success, error, 'Blueshift', 'coolMethod', [arg0]);
-// };
+/**
+* Save email in the SDK.
+* 
+* @param {String} email email of the customer.
+*/
+exports.setUserInfoEmailID = function (email) {
+    exec(null, null, 'Blueshift', 'setUserInfoEmailID', [email]);
+};
+
+/**
+* Save customerId in the SDK.
+* 
+* @param {String} customerId customerId of the customer.
+*/
+exports.setUserInfoCustomerID = function (customerId) {
+    exec(null, null, 'Blueshift', 'setUserInfoCustomerID', [customerId]);
+};
+
+/**
+* Save firstname in the SDK.
+* 
+* @param {String} firstname firstname of the customer.
+*/
+exports.setUserInfoFirstName = function (firstname) {
+    exec(null, null, 'Blueshift', 'setUserInfoFirstName', [firstname]);
+};
+
+/**
+* Save lastname in the SDK.
+* 
+* @param {String} lastname lastname of the customer.
+*/
+exports.setUserInfoLastName = function (lastname) {
+    exec(null, null, 'Blueshift', 'setUserInfoLastName', [lastname]);
+};
+
+/**
+* Save additional user info in the SDK.
+* 
+* @param {Object} extras additional user info.
+*/
+exports.setUserInfoExtras = function (extras) {
+    exec(null, null, 'Blueshift', 'setUserInfoExtras', [extras]);
+};
+
+/**
+* Remove all the saved user info from the SDK.
+*/
+exports.removeUserInfo = function () {
+    exec(null, null, 'Blueshift', 'removeUserInfo', []);
+};
+
+/**
+* Calls Blueshift's live content API with email and given slot name and live content context.
+* 
+* @param {String} slot slot name of the live content.
+* @param {Object} lcContext live content context.
+* @param {function} success success callback.
+* @param {function} error error callback.
+*/
+exports.getLiveContentByEmail = function (slot, lcContext, success, error) {
+    exec(success, error, 'Blueshift', 'getLiveContentByEmail', [slot, lcContext]);
+};
+
+/**
+* Calls Blueshift's live content API with customer id and given slot name and live content context.
+* 
+* @param {String} slot slot name of the live content.
+* @param {Object} lcContext live content context.
+* @param {function} success success callback.
+* @param {function} error error callback.
+*/
+exports.getLiveContentByCustomerID = function (slot, lcContext, success, error) {
+    exec(success, error, 'Blueshift', 'getLiveContentByCustomerID', [slot, lcContext]);
+};
+
+/**
+* Calls Blueshift's live content API with device id and given slot name and live content context.
+* 
+* @param {String} slot slot name of the live content.
+* @param {Object} lcContext live content context.
+* @param {function} success success callback.
+* @param {function} error error callback.
+*/
+exports.getLiveContentByDeviceID = function (slot, lcContext, success, error) {
+    exec(success, error, 'Blueshift', 'getLiveContentByDeviceID', [slot, lcContext]);
+};
+
+/**
+ * Enable/disable SDK's event tracking.
+ * 
+ * @param {Boolean} enabled When true, tracking is enabled. When false, disabled.
+ */
+exports.enableTracking = function (enabled) {
+    exec(null, null, 'Blueshift', 'enableTracking', [enabled]);
+};
+
+/**
+ * Enable/disable SDK's event tracking.
+ * 
+ * @param {Boolean} enabled When true, tracking is enabled. When false, disabled.
+ * @param {Boolean} wipeData When true, events will be wiped. When false, nothing happens.
+ */
+exports.enableTracking = function (enabled, wipeData) {
+    exec(null, null, 'Blueshift', 'enableTracking', [enabled, wipeData]);
+};
+
+/**
+ * Opt-in or opt-out of push notifications sent from Blueshift.
+ * 
+ * @param {Boolean} enabled When true, opt-in else opt-out.
+ */
+exports.enablePush = function (enabled) {
+    exec(null, null, 'Blueshift', 'enablePush', [enabled]);
+};
+
+/**
+ * Opt-in or opt-out of in-app notifications sent from Blueshift.
+ * 
+ * @param {Boolean} enabled When true, opt-in else opt-out.
+ */
+exports.enableInApp = function (enabled) {
+    exec(null, null, 'Blueshift', 'enableInApp', [enabled]);
+};
