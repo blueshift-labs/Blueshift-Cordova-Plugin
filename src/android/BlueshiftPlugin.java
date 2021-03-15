@@ -28,8 +28,6 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        Log.d(TAG, "{\"action\":\"" + action + "\"}");
-
         // IN APP MESSAGES
         if (action.equals("registerForInAppMessages")) return registerForInAppMessages(args);
         if (action.equals("unregisterForInAppMessages")) return unregisterForInAppMessages();
@@ -285,7 +283,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             try {
                 return jsonArray.getJSONObject(0);
             } catch (Exception e) {
-                Log.e(TAG, "getJSONObject: ", e);
+                // do nothing
             }
         }
 
