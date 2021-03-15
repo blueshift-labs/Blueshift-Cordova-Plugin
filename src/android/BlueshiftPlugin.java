@@ -20,15 +20,16 @@ import java.util.Iterator;
  * This class echoes a string called from JavaScript.
  */
 public class BlueshiftPlugin extends CordovaPlugin {
-    
+    private static final String TAG = "BlueshiftPlugin";
+
     private Blueshift getBlueshiftInstance() {
         return Blueshift.getInstance(cordova.getContext());
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        Log.d("Blueshift", "Action: " + action);
-        
+        Log.d(TAG, "{\"action\":\"" + action +"\"}");
+
         // IN APP MESSAGES
         if (action.equals("registerForInAppMessages")) return registerForInAppMessages(args);
         if (action.equals("unregisterForInAppMessages")) return unregisterForInAppMessages();
@@ -66,18 +67,24 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean registerForInAppMessages(JSONArray args) throws JSONException {
         String screenName = args.getString(0);
         // blueshift.registerForInAppMessages(cordova.getActivity(), screenName);
+        Log.d(TAG, "registerForInAppMessages: { \"screenName\" : \"" + screenName + "\"}");
+
         getBlueshiftInstance().registerForInAppMessages(cordova.getActivity());
 
         return true;
     }
 
     private boolean unregisterForInAppMessages() {
+        Log.d(TAG, "unregisterForInAppMessages: ");
+
         getBlueshiftInstance().unregisterForInAppMessages(cordova.getActivity());
 
         return true;
     }
 
     private boolean fetchInAppMessages(CallbackContext callbackContext) {
+        Log.d(TAG, "fetchInAppMessages: ");
+
         getBlueshiftInstance().fetchInAppMessages(new InAppApiCallback() {
             @Override
             public void onSuccess() {
@@ -94,6 +101,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean displayInAppMessages() {
+        Log.d(TAG, "displayInAppMessages: ");
+
         getBlueshiftInstance().displayInAppMessages();
 
         return true;
@@ -103,6 +112,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
         String eventName = args.getString(0);
         JSONObject extras = args.getJSONObject(1);
         boolean canBatch = args.getBoolean(2);
+
+        Log.d(TAG, "trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
 
         getBlueshiftInstance().trackEvent(eventName, getMap(extras), canBatch);
 
@@ -114,6 +125,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
         JSONObject extras = args.getJSONObject(0);
         boolean canBatch = args.getBoolean(1);
 
+        Log.d(TAG, "identify: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
+
         getBlueshiftInstance().trackEvent(eventName, getMap(extras), canBatch);
 
         return true;
@@ -121,6 +134,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean setUserInfoEmailID(JSONArray args) throws JSONException {
         String email = args.getString(0);
+
+        Log.d(TAG, "setUserInfoEmailID: " + email);
+
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
             userInfo.setEmail(email);
@@ -132,6 +148,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean setUserInfoCustomerID(JSONArray args) throws JSONException {
         String customerID = args.getString(0);
+
+        Log.d(TAG, "setUserInfoCustomerID: " + customerID);
+
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
             userInfo.setRetailerCustomerId(customerID);
@@ -143,6 +162,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean setUserInfoFirstname(JSONArray args) throws JSONException {
         String firstName = args.getString(0);
+
+        Log.d(TAG, "setUserInfoFirstname: " + firstName);
+
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
             userInfo.setFirstname(firstName);
@@ -154,6 +176,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean setUserInfoLastname(JSONArray args) throws JSONException {
         String lastName = args.getString(0);
+
+        Log.d(TAG, "setUserInfoLastname: " + lastName);
+
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
             userInfo.setLastname(lastName);
@@ -165,6 +190,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean setUserInfoExtras(JSONArray args) throws JSONException {
         JSONObject extras = args.getJSONObject(0);
+
+        Log.d(TAG, "setUserInfoExtras: " + extras);
+
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
             userInfo.setDetails(getMap(extras));
@@ -175,6 +203,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean removeUserInfo() {
+        Log.d(TAG, "removeUserInfo: ");
+
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
             // TODO clear user info
@@ -188,6 +218,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
         String slotName = args.getString(0);
         JSONObject liveContentContext = args.getJSONObject(1);
 
+        Log.d(TAG, "getLiveContentByEmail: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
+
         getBlueshiftInstance().getLiveContentByEmail(slotName, getMap(liveContentContext), callbackContext::success);
 
         return true;
@@ -196,6 +228,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean getLiveContentByCustomerID(JSONArray args, CallbackContext callbackContext) throws JSONException {
         String slotName = args.getString(0);
         JSONObject liveContentContext = args.getJSONObject(1);
+
+        Log.d(TAG, "getLiveContentByCustomerID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
         getBlueshiftInstance().getLiveContentByCustomerId(slotName, getMap(liveContentContext), callbackContext::success);
 
@@ -206,6 +240,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
         String slotName = args.getString(0);
         JSONObject liveContentContext = args.getJSONObject(1);
 
+        Log.d(TAG, "getLiveContentByDeviceID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
+
         getBlueshiftInstance().getLiveContentByDeviceId(slotName, getMap(liveContentContext), callbackContext::success);
 
         return true;
@@ -214,9 +250,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean enableTracking(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
         if (args.length() == 1) {
+            Log.d(TAG, "enableTracking: {\"enabled\":" + isEnabled + "}");
+
             Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled);
         } else if (args.length() == 2) {
             boolean wipeData = args.getBoolean(1);
+            Log.d(TAG, "enableTracking: {\"enabled\":" + isEnabled + ", \"wipeData\":" + wipeData + "}");
+
             Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled, wipeData);
         }
 
@@ -225,6 +265,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean enablePush(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
+        Log.d(TAG, "enablePush: {\"enabled\":" + isEnabled + "}");
         BlueshiftAppPreferences.getInstance(cordova.getContext()).setEnablePush(isEnabled);
         BlueshiftAppPreferences.getInstance(cordova.getContext()).save(cordova.getContext());
 
@@ -233,6 +274,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean enableInApp(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
+        Log.d(TAG, "enableInApp: {\"enabled\":" + isEnabled + "}");
         // TODO implement this
 
         return true;
