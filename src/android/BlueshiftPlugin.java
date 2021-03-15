@@ -163,7 +163,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoFirstName(JSONArray args) throws JSONException {
         String firstName = args.getString(0);
 
-        Log.d(TAG, "setUserInfoFirstname: " + firstName);
+        Log.d(TAG, "setUserInfoFirstName: " + firstName);
 
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
@@ -177,7 +177,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoLastName(JSONArray args) throws JSONException {
         String lastName = args.getString(0);
 
-        Log.d(TAG, "setUserInfoLastname: " + lastName);
+        Log.d(TAG, "setUserInfoLastName: " + lastName);
 
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
