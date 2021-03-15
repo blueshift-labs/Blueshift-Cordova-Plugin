@@ -281,7 +281,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     JSONObject getJSONObject(JSONArray jsonArray, int index) {
         if (jsonArray != null && index >= 0) {
             try {
-                return jsonArray.getJSONObject(0);
+                return jsonArray.getJSONObject(index);
             } catch (Exception e) {
                 // do nothing
             }
