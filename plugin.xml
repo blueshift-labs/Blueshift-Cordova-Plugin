@@ -31,6 +31,11 @@
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
         <source-file src="src/android/BlueshiftPlugin.java" target-dir="src/com/blueshift/cordova" />
+
         <framework src="com.blueshift:android-sdk:3.1.10"/>
+        <framework src="com.google.code.gson:gson:2.8.6"/>
+        <framework src="com.google.firebase:firebase-core:16.0.6"/>
+        <framework src="com.google.firebase:firebase-messaging:17.3.4"/>
+
     </platform>
 </plugin>
