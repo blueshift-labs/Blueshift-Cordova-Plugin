@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Blueshift</name>
     <js-module name="Blueshift" src="www/Blueshift.js">
-        <clobbers target="cordova.plugins.Blueshift" />
+        <clobbers target="Blueshift" />
     </js-module>
     <platform name="ios">
         <config-file parent="/*" target="config.xml">
@@ -26,10 +26,11 @@
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="Blueshift">
-                <param name="android-package" value="blueshift-cordova-plugin.Blueshift" />
+                <param name="android-package" value="com.blueshift.cordova.BlueshiftPlugin" />
             </feature>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
-        <source-file src="src/android/Blueshift.java" target-dir="src/blueshift-cordova-plugin/Blueshift" />
+        <source-file src="src/android/BlueshiftPlugin.java" target-dir="src/com/blueshift/cordova" />
+        <framework src="com.blueshift:android-sdk:3.1.10"/>
     </platform>
 </plugin>
