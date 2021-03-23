@@ -1,10 +1,12 @@
 package com.blueshift.cordova;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.blueshift.Blueshift;
 import com.blueshift.BlueshiftAppPreferences;
 import com.blueshift.inappmessage.InAppApiCallback;
+import com.blueshift.model.Configuration;
 import com.blueshift.model.UserInfo;
 
 import org.apache.cordova.CallbackContext;
@@ -22,8 +24,327 @@ import java.util.Iterator;
 public class BlueshiftPlugin extends CordovaPlugin {
     private static final String TAG = "BlueshiftPlugin";
 
-    private Blueshift getBlueshiftInstance() {
-        return Blueshift.getInstance(cordova.getContext());
+    private static final String BLUESHIFT_PREF_API_KEY = "com.blueshift.sdk.event_api_key";
+    private static final String BLUESHIFT_PREF_APP_ICON = "com.blueshift.sdk.app_icon";
+    private static final String BLUESHIFT_PREF_PUSH_ENABLED = "com.blueshift.sdk.push_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_ENABLED = "com.blueshift.sdk.in_app_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_JS_ENABLED = "com.blueshift.sdk.in_app_javascript_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_INTERVAL = "com.blueshift.sdk.in_app_interval_seconds";
+    private static final String BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED = "com.blueshift.sdk.in_app_background_fetch_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED = "com.blueshift.sdk.in_app_manual_mode_enabled";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_COLOR = "com.blueshift.sdk.notification_color";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL = "com.blueshift.sdk.notification_icon_small";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE = "com.blueshift.sdk.notification_icon_large";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID = "com.blueshift.sdk.notification_channel_id";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME = "com.blueshift.sdk.notification_channel_name";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION = "com.blueshift.sdk.notification_channel_description";
+    private static final String BLUESHIFT_PREF_DEVICE_ID_SOURCE = "com.blueshift.sdk.device_id_source";
+    private static final String BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE = "com.blueshift.sdk.device_id_custom_value";
+    private static final String BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS = "com.blueshift.sdk.batch_interval_milliseconds";
+    private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED = "com.blueshift.sdk.auto_app_open_enabled";
+    private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS = "com.blueshift.sdk.auto_app_open_interval_seconds";
+    private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.sdk.bulk_event_job_id";
+    private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.sdk.network_change_job_id";
+
+    private Context mAppContext = null;
+    private Blueshift mBlueshift = null;
+
+    private int getDrawableResId(String drawableName) {
+        return getResIdFromString(drawableName, "drawable");
+    }
+
+    private int getColorResId(String colorName) {
+        return getResIdFromString(colorName, "color");
+    }
+
+    private int getResIdFromString(String variableName, String resourceName) {
+        return mAppContext
+                .getResources()
+                .getIdentifier(variableName, resourceName, mAppContext.getPackageName());
+    }
+
+    @Override
+    protected void pluginInitialize() {
+        mAppContext = this.cordova.getContext().getApplicationContext();
+
+        mBlueshift = Blueshift.getInstance(mAppContext);
+
+        initBlueshiftWithConfig();
+    }
+
+    private void initBlueshiftWithConfig() {
+        Configuration config = new Configuration();
+
+        setApiKey(config);
+        setAppIcon(config);
+        setPushEnabled(config);
+        setInAppEnabled(config);
+        setInAppJavascriptEnabled(config);
+        setInAppInterval(config);
+        setInAppBackgroundFetchEnabled(config);
+        setInAppManualModeEnabled(config);
+        setNotificationColor(config);
+        setNotificationIconSmall(config);
+        setNotificationIconLarge(config);
+        setNotificationChannelId(config);
+        setNotificationChannelName(config);
+        setNotificationChannelDescription(config);
+        setDeviceIdSource(config);
+        setDeviceIdCustomValue(config);
+        setBatchInterval(config);
+        setAutoAppOpenEnabled(config);
+        setAutoAppOpenInterval(config);
+        setBulkEventJobId(config);
+        setNetworkChangeJobId(config);
+
+        mBlueshift.initialize(config);
+    }
+
+    private void logMissingPreference(String key) {
+        Log.d(TAG, "Preference missing.\t{ key: " + key + " }");
+    }
+
+    private void logPreferenceValue(String key, Object value) {
+        Log.d(TAG, "Preference found.\t{ key: " + key + ", value: " + value + " }");
+    }
+
+    private void setApiKey(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_API_KEY)) {
+            String apiKey = this.preferences.getString(BLUESHIFT_PREF_API_KEY, null);
+            if (apiKey != null) configuration.setApiKey(apiKey);
+
+            logPreferenceValue(BLUESHIFT_PREF_API_KEY, apiKey);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_API_KEY);
+        }
+    }
+
+    private void setAppIcon(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_APP_ICON)) {
+            String drawableName = this.preferences.getString(BLUESHIFT_PREF_APP_ICON, null);
+            if (drawableName != null) configuration.setAppIcon(getDrawableResId(drawableName));
+
+            logPreferenceValue(BLUESHIFT_PREF_APP_ICON, drawableName);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_APP_ICON);
+        }
+    }
+
+    private void setPushEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_PUSH_ENABLED)) {
+            boolean isEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_PUSH_ENABLED, true);
+            configuration.setPushEnabled(isEnabled);
+
+            logPreferenceValue(BLUESHIFT_PREF_PUSH_ENABLED, isEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_PUSH_ENABLED);
+        }
+    }
+
+    private void setInAppEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_IN_APP_ENABLED)) {
+            boolean isEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_IN_APP_ENABLED, false);
+            configuration.setInAppEnabled(isEnabled);
+
+            logPreferenceValue(BLUESHIFT_PREF_IN_APP_ENABLED, isEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_IN_APP_ENABLED);
+        }
+    }
+
+    private void setInAppJavascriptEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_IN_APP_JS_ENABLED)) {
+            boolean isEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_IN_APP_JS_ENABLED, false);
+            configuration.setJavaScriptForInAppWebViewEnabled(isEnabled);
+
+            logPreferenceValue(BLUESHIFT_PREF_IN_APP_JS_ENABLED, isEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_IN_APP_JS_ENABLED);
+        }
+    }
+
+    private void setInAppInterval(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_IN_APP_INTERVAL)) {
+            int interval = this.preferences.getInteger(BLUESHIFT_PREF_IN_APP_INTERVAL, -1);
+            if (interval >= 0) configuration.setInAppInterval(interval);
+
+            logPreferenceValue(BLUESHIFT_PREF_IN_APP_INTERVAL, interval);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_IN_APP_INTERVAL);
+        }
+    }
+
+    private void setInAppBackgroundFetchEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED)) {
+            boolean isEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED, true);
+            configuration.setInAppBackgroundFetchEnabled(isEnabled);
+
+            logPreferenceValue(BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED, isEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED);
+        }
+    }
+
+    private void setInAppManualModeEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED)) {
+            boolean isEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED, false);
+            configuration.setInAppManualTriggerEnabled(isEnabled);
+
+            logPreferenceValue(BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED, isEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED);
+        }
+    }
+
+    private void setNotificationColor(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_COLOR)) {
+            String colorName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_COLOR, null);
+            if (colorName != null) {
+                int colorResId = getColorResId(colorName);
+                int colorValue = mAppContext.getResources().getColor(colorResId);
+                configuration.setNotificationColor(colorValue);
+            }
+
+            logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_COLOR, colorName);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NOTIFICATION_COLOR);
+        }
+    }
+
+    private void setNotificationIconSmall(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL)) {
+            String drawableName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL, null);
+            if (drawableName != null)
+                configuration.setSmallIconResId(getDrawableResId(drawableName));
+
+            logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL, drawableName);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL);
+        }
+    }
+
+    private void setNotificationIconLarge(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE)) {
+            String drawableName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE, null);
+            if (drawableName != null)
+                configuration.setLargeIconResId(getDrawableResId(drawableName));
+
+            logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE, drawableName);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE);
+        }
+    }
+
+    private void setNotificationChannelId(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID)) {
+            String channelId = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID, null);
+            if (channelId != null) configuration.setDefaultNotificationChannelId(channelId);
+
+            logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID, channelId);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID);
+        }
+    }
+
+    private void setNotificationChannelName(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME)) {
+            String channelName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME, null);
+            if (channelName != null) configuration.setDefaultNotificationChannelName(channelName);
+
+            logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME, channelName);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME);
+        }
+    }
+
+    private void setNotificationChannelDescription(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION)) {
+            String channelDescription = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION, null);
+            if (channelDescription != null)
+                configuration.setDefaultNotificationChannelName(channelDescription);
+
+            logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION, channelDescription);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION);
+        }
+    }
+
+    private void setDeviceIdSource(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_DEVICE_ID_SOURCE)) {
+            String deviceIdSource = this.preferences.getString(BLUESHIFT_PREF_DEVICE_ID_SOURCE, null);
+            if (deviceIdSource != null)
+                configuration.setDeviceIdSource(Blueshift.DeviceIdSource.valueOf(deviceIdSource));
+
+            logPreferenceValue(BLUESHIFT_PREF_DEVICE_ID_SOURCE, deviceIdSource);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_DEVICE_ID_SOURCE);
+        }
+    }
+
+    private void setDeviceIdCustomValue(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE)) {
+            String deviceId = this.preferences.getString(BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE, null);
+            if (deviceId != null) configuration.setCustomDeviceId(deviceId);
+
+            logPreferenceValue(BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE, deviceId);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE);
+        }
+    }
+
+    private void setBatchInterval(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS)) {
+            int interval = this.preferences.getInteger(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS, -1);
+            if (interval >= 0) configuration.setBatchInterval(interval);
+
+            logPreferenceValue(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS, interval);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS);
+        }
+    }
+
+    private void setAutoAppOpenEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED)) {
+            boolean isEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED, false);
+            configuration.setEnableAutoAppOpenFiring(isEnabled);
+
+            logPreferenceValue(BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED, isEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED);
+        }
+    }
+
+    private void setAutoAppOpenInterval(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS)) {
+            int interval = this.preferences.getInteger(BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS, -1);
+            if (interval >= 0) configuration.setAutoAppOpenInterval(interval);
+
+            logPreferenceValue(BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS, interval);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS);
+        }
+    }
+
+    private void setBulkEventJobId(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_BULK_EVENT_JOB_ID)) {
+            int jobId = this.preferences.getInteger(BLUESHIFT_PREF_BULK_EVENT_JOB_ID, -1);
+            if (jobId >= 0) configuration.setBulkEventsJobId(jobId);
+
+            logPreferenceValue(BLUESHIFT_PREF_BULK_EVENT_JOB_ID, jobId);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_BULK_EVENT_JOB_ID);
+        }
+    }
+
+    private void setNetworkChangeJobId(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID)) {
+            int jobId = this.preferences.getInteger(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID, -1);
+            if (jobId >= 0) configuration.setNetworkChangeListenerJobId(jobId);
+
+            logPreferenceValue(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID, jobId);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID);
+        }
     }
 
     @Override
@@ -67,7 +388,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         // blueshift.registerForInAppMessages(cordova.getActivity(), screenName);
         Log.d(TAG, "registerForInAppMessages: { \"screenName\" : \"" + screenName + "\"}");
 
-        getBlueshiftInstance().registerForInAppMessages(cordova.getActivity());
+        mBlueshift.registerForInAppMessages(cordova.getActivity());
 
         return true;
     }
@@ -75,7 +396,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean unregisterForInAppMessages() {
         Log.d(TAG, "unregisterForInAppMessages: ");
 
-        getBlueshiftInstance().unregisterForInAppMessages(cordova.getActivity());
+        mBlueshift.unregisterForInAppMessages(cordova.getActivity());
 
         return true;
     }
@@ -83,7 +404,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean fetchInAppMessages(CallbackContext callbackContext) {
         Log.d(TAG, "fetchInAppMessages: ");
 
-        getBlueshiftInstance().fetchInAppMessages(new InAppApiCallback() {
+        mBlueshift.fetchInAppMessages(new InAppApiCallback() {
             @Override
             public void onSuccess() {
                 callbackContext.success();
@@ -101,7 +422,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean displayInAppMessages() {
         Log.d(TAG, "displayInAppMessages: ");
 
-        getBlueshiftInstance().displayInAppMessages();
+        mBlueshift.displayInAppMessages();
 
         return true;
     }
@@ -113,7 +434,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         Log.d(TAG, "trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
 
-        getBlueshiftInstance().trackEvent(eventName, getMap(extras), canBatch);
+        mBlueshift.trackEvent(eventName, getMap(extras), canBatch);
 
         return true;
     }
@@ -125,7 +446,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         Log.d(TAG, "identify: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
 
-        getBlueshiftInstance().trackEvent(eventName, getMap(extras), canBatch);
+        mBlueshift.trackEvent(eventName, getMap(extras), canBatch);
 
         return true;
     }
@@ -218,7 +539,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         Log.d(TAG, "getLiveContentByEmail: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
-        getBlueshiftInstance().getLiveContentByEmail(slotName, getMap(liveContentContext), callbackContext::success);
+        mBlueshift.getLiveContentByEmail(slotName, getMap(liveContentContext), callbackContext::success);
 
         return true;
     }
@@ -229,7 +550,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         Log.d(TAG, "getLiveContentByCustomerID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
-        getBlueshiftInstance().getLiveContentByCustomerId(slotName, getMap(liveContentContext), callbackContext::success);
+        mBlueshift.getLiveContentByCustomerId(slotName, getMap(liveContentContext), callbackContext::success);
 
         return true;
     }
@@ -240,7 +561,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         Log.d(TAG, "getLiveContentByDeviceID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
-        getBlueshiftInstance().getLiveContentByDeviceId(slotName, getMap(liveContentContext), callbackContext::success);
+        mBlueshift.getLiveContentByDeviceId(slotName, getMap(liveContentContext), callbackContext::success);
 
         return true;
     }
@@ -250,12 +571,12 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (args.length() == 1) {
             Log.d(TAG, "enableTracking: {\"enabled\":" + isEnabled + "}");
 
-            Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled);
+            Blueshift.setTrackingEnabled(mAppContext, isEnabled);
         } else if (args.length() == 2) {
             boolean wipeData = args.getBoolean(1);
             Log.d(TAG, "enableTracking: {\"enabled\":" + isEnabled + ", \"wipeData\":" + wipeData + "}");
 
-            Blueshift.setTrackingEnabled(cordova.getContext(), isEnabled, wipeData);
+            Blueshift.setTrackingEnabled(mAppContext, isEnabled, wipeData);
         }
 
         return true;
