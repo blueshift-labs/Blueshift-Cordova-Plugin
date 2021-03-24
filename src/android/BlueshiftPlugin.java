@@ -24,6 +24,12 @@ import java.util.Iterator;
 public class BlueshiftPlugin extends CordovaPlugin {
     private static final String TAG = "BlueshiftPlugin";
 
+    /**
+     * The below keys can be used for specifying the config values in the form of preferences.
+     *
+     * Ex:
+     * <preference name="com.blueshift.sdk.in_app_enabled" value="true"/>
+     */
     private static final String BLUESHIFT_PREF_API_KEY = "com.blueshift.sdk.event_api_key";
     private static final String BLUESHIFT_PREF_APP_ICON = "com.blueshift.sdk.app_icon";
     private static final String BLUESHIFT_PREF_PUSH_ENABLED = "com.blueshift.sdk.push_enabled";
