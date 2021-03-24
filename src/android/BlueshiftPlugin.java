@@ -28,29 +28,29 @@ public class BlueshiftPlugin extends CordovaPlugin {
      * The below keys can be used for specifying the config values in the form of preferences.
      *
      * Ex:
-     * <preference name="com.blueshift.sdk.in_app_enabled" value="true"/>
+     * <preference name="com.blueshift.config.in_app_enabled" value="true"/>
      */
-    private static final String BLUESHIFT_PREF_API_KEY = "com.blueshift.sdk.event_api_key";
-    private static final String BLUESHIFT_PREF_APP_ICON = "com.blueshift.sdk.app_icon";
-    private static final String BLUESHIFT_PREF_PUSH_ENABLED = "com.blueshift.sdk.push_enabled";
-    private static final String BLUESHIFT_PREF_IN_APP_ENABLED = "com.blueshift.sdk.in_app_enabled";
-    private static final String BLUESHIFT_PREF_IN_APP_JS_ENABLED = "com.blueshift.sdk.in_app_javascript_enabled";
-    private static final String BLUESHIFT_PREF_IN_APP_INTERVAL = "com.blueshift.sdk.in_app_interval_seconds";
-    private static final String BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED = "com.blueshift.sdk.in_app_background_fetch_enabled";
-    private static final String BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED = "com.blueshift.sdk.in_app_manual_mode_enabled";
-    private static final String BLUESHIFT_PREF_NOTIFICATION_COLOR = "com.blueshift.sdk.notification_color";
-    private static final String BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL = "com.blueshift.sdk.notification_icon_small";
-    private static final String BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE = "com.blueshift.sdk.notification_icon_large";
-    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID = "com.blueshift.sdk.notification_channel_id";
-    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME = "com.blueshift.sdk.notification_channel_name";
-    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION = "com.blueshift.sdk.notification_channel_description";
-    private static final String BLUESHIFT_PREF_DEVICE_ID_SOURCE = "com.blueshift.sdk.device_id_source";
-    private static final String BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE = "com.blueshift.sdk.device_id_custom_value";
-    private static final String BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS = "com.blueshift.sdk.batch_interval_milliseconds";
-    private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED = "com.blueshift.sdk.auto_app_open_enabled";
-    private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS = "com.blueshift.sdk.auto_app_open_interval_seconds";
-    private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.sdk.bulk_event_job_id";
-    private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.sdk.network_change_job_id";
+    private static final String BLUESHIFT_PREF_API_KEY = "com.blueshift.config.event_api_key";
+    private static final String BLUESHIFT_PREF_APP_ICON = "com.blueshift.config.app_icon";
+    private static final String BLUESHIFT_PREF_PUSH_ENABLED = "com.blueshift.config.push_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_ENABLED = "com.blueshift.config.in_app_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_JS_ENABLED = "com.blueshift.config.in_app_javascript_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_INTERVAL = "com.blueshift.config.in_app_interval_seconds";
+    private static final String BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED = "com.blueshift.config.in_app_background_fetch_enabled";
+    private static final String BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED = "com.blueshift.config.in_app_manual_mode_enabled";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_COLOR = "com.blueshift.config.notification_color";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL = "com.blueshift.config.notification_icon_small";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE = "com.blueshift.config.notification_icon_large";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_ID = "com.blueshift.config.notification_channel_id";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_NAME = "com.blueshift.config.notification_channel_name";
+    private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION = "com.blueshift.config.notification_channel_description";
+    private static final String BLUESHIFT_PREF_DEVICE_ID_SOURCE = "com.blueshift.config.device_id_source";
+    private static final String BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE = "com.blueshift.config.device_id_custom_value";
+    private static final String BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS = "com.blueshift.config.batch_interval_milliseconds";
+    private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED = "com.blueshift.config.auto_app_open_enabled";
+    private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS = "com.blueshift.config.auto_app_open_interval_seconds";
+    private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
+    private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;

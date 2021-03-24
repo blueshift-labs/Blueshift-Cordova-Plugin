@@ -35,7 +35,7 @@
             <feature name="Blueshift">
                 <param name="android-package" value="com.blueshift.cordova.BlueshiftPlugin" />
             </feature>
-            <preference name="com.blueshift.sdk.event_api_key" value="$BSFT_EVENT_API_KEY"/>
+            <preference name="com.blueshift.config.event_api_key" value="$BSFT_EVENT_API_KEY"/>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
         <source-file src="src/android/BlueshiftPlugin.java" target-dir="src/com/blueshift/cordova" />
