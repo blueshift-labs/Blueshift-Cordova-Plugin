@@ -5,7 +5,7 @@
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
 
-@interface BlueshiftCordova : CDVPlugin
+@interface BlueshiftPlugin : CDVPlugin
 
 // In App notifications
 - (void)registerForInAppMessages:(CDVInvokedUrlCommand*)command;
@@ -20,8 +20,8 @@
 // Set UserInfo
 - (void)setUserInfoEmailID:(CDVInvokedUrlCommand*)command;
 - (void)setUserInfoCustomerID:(CDVInvokedUrlCommand*)command;
-- (void)setUserInfoFirstname:(CDVInvokedUrlCommand*)command;
-- (void)setUserInfoLastname:(CDVInvokedUrlCommand*)command;
+- (void)setUserInfoFirstName:(CDVInvokedUrlCommand*)command;
+- (void)setUserInfoLastName:(CDVInvokedUrlCommand*)command;
 - (void)setUserInfoExtras:(CDVInvokedUrlCommand*)command;
 - (void)removeUserInfo:(CDVInvokedUrlCommand*)command;
 

@@ -9,18 +9,17 @@
     <platform name="ios">
         <config-file parent="/*" target="config.xml">
             <feature name="Blueshift">
-                <param name="ios-package" value="Blueshift" />
+                <param name="ios-package" value="BlueshiftPlugin" />
             </feature>
         </config-file>
-        <source-file src="src/ios/BlueshiftCordova.h" />
-        <source-file src="src/ios/BlueshiftCordova.m" />
+        <source-file src="src/ios/BlueshiftPlugin.h" />
+        <source-file src="src/ios/BlueshiftPlugin.m" />
         <podspec>
           <config>
             <source url="https://github.com/CocoaPods/Specs.git"/>
           </config>
           <pods use-frameworks="true">
-            <pod name="BlueShift-iOS-Extension-SDK" spec="~> 2.1.14"/>
-            <pod name="BlueShift-iOS-SDK" spec="~> 2.1.14" />
+            <pod name="BlueShift-iOS-SDK" spec="~> 2.1.16" />
           </pods>
         </podspec>
     </platform>

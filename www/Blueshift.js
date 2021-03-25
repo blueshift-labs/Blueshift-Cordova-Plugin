@@ -178,3 +178,22 @@ exports.enablePush = function (enabled) {
 exports.enableInApp = function (enabled) {
     exec(null, null, 'Blueshift', 'enableInApp', [enabled]);
 };
+
+/**
+ * Register for remote notifications using SDK. Calling this method will show push permission dialogue to the user.
+ * Note - This is only applicable for the iOS devices.
+ */
+exports.registerForRemoteNotification = function () {
+    exec(null, null, 'Blueshift', 'registerForRemoteNotification', []);
+};
+
+/**
+ * Set current location of the device in the Blueshift SDK.
+ * Note - This is only applicable for the iOS devices.
+ *
+ * @param {double} latitude location latitude value.
+ * @param {double} longitude location longitude value.
+ */
+exports.setCurrentLocation = function (latitude, longitude) {
+    exec(null, null, 'Blueshift', 'setCurrentLocation', [latitude,longitude]);
+};
