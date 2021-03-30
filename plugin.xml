@@ -42,14 +42,14 @@
             </feature>
             <preference name="com.blueshift.config.event_api_key" value="$BSFT_EVENT_API_KEY"/>
         </config-file>
+        <!-- Add required permissions for Blueshift SDK to AndroidManifest.xml -->
         <config-file parent="/*" target="AndroidManifest.xml">
-            <!-- PERMISSIONS -->
             <uses-permission android:name="android.permission.INTERNET" />
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Optional -->
         </config-file>
+        <!-- Adding Blueshift's FirebaseMessagingService implementation to AndroidManifest.xml -->
         <config-file parent="/manifest/application" target="AndroidManifest.xml">
-            <!-- FCM Receiver -->
             <service android:name="com.blueshift.fcm.BlueshiftMessagingService">
                 <intent-filter>
                     <action android:name="com.google.firebase.MESSAGING_EVENT" />
