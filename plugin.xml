@@ -31,13 +31,31 @@
         <preference name="FIREBASE_CORE_VERSION" default="16.0.6"/>
         <preference name="FIREBASE_MESSAGING_VERSION" default="17.3.4"/>
 
+        <config-file parent="/*" target="config.xml">
+            <preference name="GradlePluginGoogleServicesEnabled" value="true" />
+            <preference name="GradlePluginGoogleServicesVersion" value="4.3.5" />
+        </config-file>
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="Blueshift">
                 <param name="android-package" value="com.blueshift.cordova.BlueshiftPlugin" />
+                <param name="onload" value="true" />
             </feature>
             <preference name="com.blueshift.config.event_api_key" value="$BSFT_EVENT_API_KEY"/>
         </config-file>
-        <config-file parent="/*" target="AndroidManifest.xml"></config-file>
+        <config-file parent="/*" target="AndroidManifest.xml">
+            <!-- PERMISSIONS -->
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Optional -->
+        </config-file>
+        <config-file parent="/manifest/application" target="AndroidManifest.xml">
+            <!-- FCM Receiver -->
+            <service android:name="com.blueshift.fcm.BlueshiftMessagingService">
+                <intent-filter>
+                    <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                </intent-filter>
+            </service>
+        </config-file>
         <source-file src="src/android/BlueshiftPlugin.java" target-dir="src/com/blueshift/cordova" />
 
         <framework src="com.blueshift:android-sdk:$BSFT_SDK_VERSION"/>
