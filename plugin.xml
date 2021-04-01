@@ -7,13 +7,18 @@
         <clobbers target="Blueshift" />
     </js-module>
     <platform name="ios">
+        <preference name="BSFT_EVENT_API_KEY" />
         <config-file parent="/*" target="config.xml">
             <feature name="Blueshift">
                 <param name="ios-package" value="BlueshiftPlugin" />
+                <param name="onload" value="true" />
+                <preference name="com.blueshift.config.event_api_key" value="$BSFT_EVENT_API_KEY"/>
             </feature>
         </config-file>
         <source-file src="src/ios/BlueshiftPlugin.h" />
         <source-file src="src/ios/BlueshiftPlugin.m" />
+        <source-file src="src/ios/AppDelegate+BlueshiftPlugin.h" />
+        <source-file src="src/ios/AppDelegate+BlueshiftPlugin.m" />
         <podspec>
           <config>
             <source url="https://github.com/CocoaPods/Specs.git"/>

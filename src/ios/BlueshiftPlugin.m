@@ -5,9 +5,30 @@
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
 
+#define BLUESHIFT_PREF_API_KEY @"com.blueshift.config.event_api_key"
+#define BLUESHIFT_PREF_PUSH_ENABLED @"com.blueshift.config.push_enabled"
+#define BLUESHIFT_PREF_IN_APP_ENABLED @"com.blueshift.config.in_app_enabled"
+#define BLUESHIFT_PREF_IN_APP_INTERVAL @"com.blueshift.config.in_app_interval_seconds"
+#define BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED @"com.blueshift.config.in_app_background_fetch_enabled"
+#define BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED @"com.blueshift.config.in_app_manual_mode_enabled"
+#define BLUESHIFT_PREF_DEVICE_ID_SOURCE @"com.blueshift.config.device_id_source"
+#define BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE @"com.blueshift.config.device_id_custom_value"
+#define BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS @"com.blueshift.config.batch_interval_seconds"
+#define BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED @"com.blueshift.config.auto_app_open_enabled"
+#define BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS @"com.blueshift.config.auto_app_open_interval_seconds"
+
+#define BLUESHIFT_PREF_DEBUG_ENABLED @"com.blueshift.config.debug_enabled"
+#define BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED @"com.blueshift.config.scene_delegate_enabled"
+#define BLUESHIFT_PREF_APP_GROUP_ID @"com.blueshift.config.app_group_id"
+#define BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED @"com.blueshift.config.idfa_collection_enabled"
+#define BLUESHIFT_PREF_SILENT_PUSH_ENABLED @"com.blueshift.config.silent_push_enabled"
+
+#define BLUESHIFT_SERIAL_QUEUE "com.blueshift.sdk"
+
 #import <Cordova/CDV.h>
-#import <BlueShift_iOS_SDK/BlueShift.h>
 #import "BlueshiftPlugin.h"
+#import "AppDelegate.h"
+#import <UserNotifications/UNUserNotificationCenter.h>
 
 @implementation BlueshiftPlugin
 
@@ -15,13 +36,166 @@ static dispatch_queue_t bsft_serial_queue() {
     static dispatch_queue_t bsft_serial_queue;
     static dispatch_once_t s_done;
     dispatch_once(&s_done, ^{
-        bsft_serial_queue = dispatch_queue_create("com.blueshift.cordova", DISPATCH_QUEUE_SERIAL);
-        
+        bsft_serial_queue = dispatch_queue_create(BLUESHIFT_SERIAL_QUEUE, DISPATCH_QUEUE_SERIAL);
     });
-    
     return bsft_serial_queue;
 }
 
+#pragma mark: Plugin initialisation
+- (void)pluginInitialize {
+    [self initialiseBlueshiftSDK];
+}
+
+- (void)initialiseBlueshiftSDK {
+    BlueShiftConfig *config = [[BlueShiftConfig alloc] init];
+    [self setAPIKeyForConfig:config];
+    
+    [self setAppGroupIdForConfig:config];
+    [self setDebugEnabledForConfig:config];
+    [self setIDFACollectionEnabledForConfig:config];
+    [self setSceneDelegateEnabledForConfig:config];
+
+    [self setPushEnabledForConfig:config];
+    [self setSilentPushEnabledForConfig:config];
+
+    [self setInAppEnabledForConfig:config];
+    [self setInAppIntervalForConfig:config];
+    [self setInAppManualModeEnabledForConfig:config];
+    [self setBackgroundFetchEnabledForConfig:config];
+    
+    [self setBatchUploadIntervalForConfig:config];
+    [self setDeviceIdSourceForConfig:config];
+    [self setAppOpenIntervalForConfig:config];
+    
+    config.blueshiftUniversalLinksDelegate = self;
+    
+    [BlueShift initWithConfiguration:config];
+}
+
+- (void)setAPIKeyForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_API_KEY] != nil) {
+        NSString* apiKey = (NSString*)[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_API_KEY];
+        config.apiKey = apiKey;
+    }
+}
+
+- (void)setDebugEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEBUG_ENABLED] != nil) {
+        BOOL debugEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEBUG_ENABLED] boolValue];
+        config.debug = debugEnabled;
+    }
+}
+
+- (void)setSceneDelegateEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED] != nil) {
+        BOOL isSceneDelegateEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED] boolValue];
+        if (@available(iOS 13.0, *)) {
+            config.isSceneDelegateConfiguration = isSceneDelegateEnabled;
+        }
+    }
+}
+
+- (void)setIDFACollectionEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED] != nil) {
+        BOOL isIDFACollectionEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED] boolValue];
+        config.enableIDFACollection = isIDFACollectionEnabled;
+    }
+}
+- (void)setAppGroupIdForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_APP_GROUP_ID] != nil) {
+        NSString* appGroupID = (NSString*)[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_APP_GROUP_ID];
+        config.appGroupID = appGroupID;
+    }
+}
+
+- (void)setPushEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_PUSH_ENABLED] != nil) {
+        BOOL enablePushNotification = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_PUSH_ENABLED] boolValue];
+        config.enablePushNotification = enablePushNotification;
+    }
+}
+
+- (void)setSilentPushEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SILENT_PUSH_ENABLED] != nil) {
+        BOOL enableSilentPushNotification = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SILENT_PUSH_ENABLED] boolValue];
+        config.enableSilentPushNotification = enableSilentPushNotification;
+    }
+}
+
+- (void)setInAppEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_ENABLED] != nil) {
+        BOOL enableInAppNotification = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_ENABLED] boolValue];
+        config.enableInAppNotification = enableInAppNotification;
+    }
+}
+
+- (void)setInAppIntervalForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_INTERVAL] != nil) {
+        double inAppNotificationInterval = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_INTERVAL] doubleValue];
+        if (inAppNotificationInterval != 0) {
+            config.BlueshiftInAppNotificationTimeInterval = inAppNotificationInterval;
+        }
+    }
+}
+
+- (void)setDeviceIdSourceForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] != nil) {
+        double deviceIdSource = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] intValue];
+        config.blueshiftDeviceIdSource = (BlueshiftDeviceIdSource)deviceIdSource;
+        if (config.blueshiftDeviceIdSource == BlueshiftDeviceIdSourceCustom) {
+            [self setCustomDeviceForConfig:config];
+        }
+    }
+}
+
+- (void)setCustomDeviceForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE] != nil) {
+        NSString *customDeviceId = (NSString*)[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE];
+        config.customDeviceId = customDeviceId;
+    }
+}
+
+- (void)setInAppManualModeEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED] != nil) {
+        BOOL inAppManualTriggerEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED] boolValue];
+        config.inAppManualTriggerEnabled = inAppManualTriggerEnabled;
+    }
+}
+
+- (void)setBackgroundFetchEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED] != nil) {
+        BOOL inAppBackgroundFetchEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED] boolValue];
+        config.inAppBackgroundFetchEnabled = inAppBackgroundFetchEnabled;
+    }
+}
+
+- (void)setBatchUploadIntervalForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS] != nil) {
+        double batchUploadInterval = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS] doubleValue];
+        if (batchUploadInterval != 0) {
+            [BlueShiftBatchUploadConfig.sharedInstance setBatchUploadTimer:batchUploadInterval];
+        }
+    }
+}
+
+- (void)setAppOpenTrackingEnabledForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED] != nil) {
+        BOOL enableAppOpenTrackEvent = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED] boolValue];
+        config.enableAppOpenTrackEvent = enableAppOpenTrackEvent;
+        if (enableAppOpenTrackEvent) {
+            [self setAppOpenIntervalForConfig:config];
+        }
+    }
+}
+
+- (void)setAppOpenIntervalForConfig:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS] != nil) {
+        double appOpenInterval = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS] doubleValue];
+        config.automaticAppOpenTimeInterval = appOpenInterval;
+    }
+}
+
+#pragma mark: In app messages
 - (void)registerForInAppMessages:(CDVInvokedUrlCommand*)command
 {
     if (command.arguments.count > 0) {
@@ -70,6 +244,7 @@ static dispatch_queue_t bsft_serial_queue() {
     }];
 }
 
+#pragma mark: Events
 - (void)trackCustomEvent:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count > 0) {
         [self runOnSerialQueue:^{
@@ -112,6 +287,7 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
+#pragma mark: User info
 - (void)setUserInfoEmailID:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count > 0) {
         [self runOnSerialQueue:^{
@@ -177,7 +353,7 @@ static dispatch_queue_t bsft_serial_queue() {
         [self runOnSerialQueue:^{
             NSDictionary* extras = (NSDictionary*)[command.arguments objectAtIndex:0];
             if (extras && [extras isKindOfClass:[NSDictionary class]]) {
-                [[BlueShiftUserInfo sharedInstance] setExtras:extras];
+//                [[BlueShiftUserInfo sharedInstance] setExtras:extras];
                 [[BlueShiftUserInfo sharedInstance] save];
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully set the extras for the user."];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -197,6 +373,7 @@ static dispatch_queue_t bsft_serial_queue() {
     }];
 }
 
+#pragma mark: enable/disable SDK functinality
 - (void)enableTracking:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         BOOL isEnabled = [[command.arguments objectAtIndex:0] boolValue];
@@ -221,6 +398,7 @@ static dispatch_queue_t bsft_serial_queue() {
     
 }
 
+#pragma mark: Live content
 - (void)getLiveContentByEmail:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count > 0) {
         NSString* slot = (NSString*)[command.arguments objectAtIndex:0];
@@ -296,6 +474,7 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
+#pragma mark: Push notifications
 - (void)registerForRemoteNotification:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         CDVPluginResult* pluginResult = nil;
@@ -305,6 +484,7 @@ static dispatch_queue_t bsft_serial_queue() {
     }];
 }
 
+#pragma mark: Location
 - (void)setCurrentLocation:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count == 2) {
         double latitude = [[command.arguments objectAtIndex: 0] doubleValue];
@@ -326,10 +506,25 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
+#pragma mark: Serial queue
 - (void)runOnSerialQueue:(void (^)(void))block {
     dispatch_async(bsft_serial_queue(), ^{
         block();
     });
 }
+
+#pragma mark: Blueshift Universal links delegate methods
+- (void) didCompleteLinkProcessing: (NSURL *_Nullable)url {
+    
+}
+
+- (void) didFailLinkProcessingWithError: (NSError *_Nullable)error url:(NSURL *_Nullable)url {
+    
+}
+
+- (void) didStartLinkProcessing {
+    
+}
+
 
 @end

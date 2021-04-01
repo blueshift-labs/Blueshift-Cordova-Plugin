@@ -5,7 +5,9 @@
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
 
-@interface BlueshiftPlugin : CDVPlugin
+#import <BlueShift_iOS_SDK/BlueShift.h>
+
+@interface BlueshiftPlugin : CDVPlugin <BlueshiftUniversalLinksDelegate>
 
 // In App notifications
 - (void)registerForInAppMessages:(CDVInvokedUrlCommand*)command;
