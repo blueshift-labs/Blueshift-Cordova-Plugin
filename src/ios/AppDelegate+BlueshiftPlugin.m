@@ -37,6 +37,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
 #pragma mark: Open URL delegate methods
 - (BOOL)application:(UIApplication*)application openURL:(NSURL*)url sourceApplication:(NSString*)sourceApplication annotation:(id)annotation {
+    //TODO: Pass deep link to JS layer
     if (!url) {
         return NO;
     }
@@ -44,7 +45,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary *)options {
-    [self showAlertForURL:url andTitle:@"Deep link 2"];
+    //TODO: Pass deep link to JS layer
     if (!url) {
         return NO;
     }
@@ -57,18 +58,6 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
         [[BlueShift sharedInstance].appDelegate handleBlueshiftUniversalLinksForURL:url];
     }
     return YES;
-}
-
-- (void)openURL:(NSURL*)url options:(NSDictionary<NSString *, id> *)options completionHandler:(void (^ __nullable)(BOOL success))completion {
-    [self showAlertForURL:url andTitle:@"Deep link"];
-}
-
-- (void)showAlertForURL:(NSURL*)url andTitle:(NSString*)title {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title message:url.absoluteString preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction* cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:nil];
-    [alertController addAction:cancel];
-    UIViewController *rootviewController = [[[UIApplication sharedApplication] delegate] window].rootViewController;
-    [rootviewController presentViewController:alertController animated:YES completion:nil];
 }
 
 #pragma mark: Application Life cycle methods

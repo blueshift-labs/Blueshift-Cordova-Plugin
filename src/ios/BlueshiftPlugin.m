@@ -140,7 +140,7 @@ static dispatch_queue_t bsft_serial_queue() {
 
 - (void)setDeviceIdSourceForConfig:(BlueShiftConfig*)config {
     if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] != nil) {
-        double deviceIdSource = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] intValue];
+        int deviceIdSource = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] intValue];
         config.blueshiftDeviceIdSource = (BlueshiftDeviceIdSource)deviceIdSource;
         if (config.blueshiftDeviceIdSource == BlueshiftDeviceIdSourceCustom) {
             [self setCustomDeviceForConfig:config];
@@ -219,7 +219,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)unregisterForInAppMessages:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         [[BlueShift sharedInstance] unregisterForInAppMessage];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully un-registered for in-app notfiications."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully un-registered for in-app notifications."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -227,10 +227,10 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)fetchInAppMessages:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         [[BlueShift sharedInstance] fetchInAppNotificationFromAPI:^{
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully fetched in-app notfiications."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully fetched in-app notifications."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         } failure:^(NSError * _Nonnull error) {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch in-app notfiications."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch in-app notifications."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     }];
@@ -239,7 +239,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)displayInAppMessages:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         [[BlueShift sharedInstance] displayInAppNotification];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully un-registered for in-app notfiications."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully un-registered for in-app notifications."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -307,7 +307,7 @@ static dispatch_queue_t bsft_serial_queue() {
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed save the user email id."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the user email id."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -322,7 +322,7 @@ static dispatch_queue_t bsft_serial_queue() {
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed save the user customer id."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the user customer id."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -337,7 +337,7 @@ static dispatch_queue_t bsft_serial_queue() {
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed save the user first name."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the user first name."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -352,7 +352,7 @@ static dispatch_queue_t bsft_serial_queue() {
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed save the user last name."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the user last name."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -367,12 +367,12 @@ static dispatch_queue_t bsft_serial_queue() {
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully set the extras for the user."];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             } else {
-                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Extras passed are not in valid JSON format. Failed set the extras."];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Extras passed are not in valid JSON format. Failed to set the extras."];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             }
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the extras."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the extras."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -380,7 +380,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)removeUserInfo:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         [BlueShiftUserInfo removeCurrentUserInfo];
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully removed the user info."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully removed the user info."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -390,16 +390,16 @@ static dispatch_queue_t bsft_serial_queue() {
     if (command.arguments.count > 0) {
         [self runOnSerialQueue:^{
             BOOL isEnabled = [[command.arguments objectAtIndex:0] boolValue];
-            BOOL wipeData = YES;
+            BOOL wipeData = !isEnabled;
             if (command.arguments.count > 1) {
                 wipeData = [[command.arguments objectAtIndex:1] boolValue];
             }
             [[BlueShift sharedInstance] enableTracking:isEnabled andEraseNonSyncedData:wipeData];
-            CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable tracking status."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable tracking status."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the enable tracking status."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the enable tracking status."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -409,11 +409,11 @@ static dispatch_queue_t bsft_serial_queue() {
         [self runOnSerialQueue:^{
             BOOL isPushEnabled = [[command.arguments objectAtIndex:0] boolValue];
             [[BlueShiftAppData currentAppData] setEnablePush:isPushEnabled];
-            CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable push status."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable push status."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the enable push status."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the enable push status."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -423,11 +423,11 @@ static dispatch_queue_t bsft_serial_queue() {
         [self runOnSerialQueue:^{
             BOOL isInAppEnabled = [[command.arguments objectAtIndex:0] boolValue];
             [[BlueShiftAppData currentAppData] setEnableInApp:isInAppEnabled];
-            CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable inApp status."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable inApp status."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the enable inApp status."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set the enable inApp status."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -450,12 +450,12 @@ static dispatch_queue_t bsft_serial_queue() {
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                     
                 } failure:^(NSError * error) {
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"API failed to fetch live content using email."];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch live content using email id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }];
             }];
         } else {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to fetch live content using email ."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to fetch live content using email id."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
     }
@@ -476,14 +476,13 @@ static dispatch_queue_t bsft_serial_queue() {
                 [BlueShiftLiveContent fetchLiveContentByCustomerID:slot withContext:context success:^(NSDictionary * data) {
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                    
                 } failure:^(NSError * error) {
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"API failed to fetch live content using customer id."];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch live content using customer id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }];
             }];
         } else {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to fetch live content using email."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to fetch live content using customer id."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
     }
@@ -505,12 +504,12 @@ static dispatch_queue_t bsft_serial_queue() {
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 } failure:^(NSError * error) {
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"API failed to fetch live content using device Id."];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch live content using device id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }];
             }];
         } else {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to fetch live content using device Id."];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to fetch live content using device id."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }
     }
@@ -543,7 +542,7 @@ static dispatch_queue_t bsft_serial_queue() {
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
     } else {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set location."];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set device location."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
@@ -553,7 +552,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getEnableInAppStatus:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         BOOL isEnabled = [BlueShiftAppData currentAppData].enableInApp;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -561,7 +560,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getEnablePushStatus:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         BOOL isEnabled = [BlueShiftAppData currentAppData].enablePush;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -569,14 +568,14 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getEnableTrackingStatus:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         BOOL isEnabled = [BlueShift sharedInstance].isTrackingEnabled;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 - (void)getUserInfoEmailID:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* emailId = [BlueShiftUserInfo sharedInstance].email;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:emailId];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:emailId];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -584,7 +583,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoCustomerID:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* customerId = [BlueShiftUserInfo sharedInstance].retailerCustomerID;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:customerId];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:customerId];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -592,7 +591,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoFirstname:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* firstName = [BlueShiftUserInfo sharedInstance].firstName;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:firstName];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:firstName];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -600,7 +599,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoLastname:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* lastName = [BlueShiftUserInfo sharedInstance].lastName;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:lastName];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:lastName];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -608,7 +607,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoExtras:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         NSDictionary* extras = [BlueShiftUserInfo sharedInstance].extras;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:extras];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:extras];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -616,7 +615,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getCurrentDeviceId:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* deviceId = [BlueShiftDeviceData currentDeviceData].deviceUUID;
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
@@ -630,15 +629,15 @@ static dispatch_queue_t bsft_serial_queue() {
 
 #pragma mark: Blueshift Universal links delegate methods
 - (void) didCompleteLinkProcessing: (NSURL *_Nullable)url {
-    
+    //TODO: pass event to JS layer
 }
 
 - (void) didFailLinkProcessingWithError: (NSError *_Nullable)error url:(NSURL *_Nullable)url {
-    
+    //TODO: pass event to JS layer
 }
 
 - (void) didStartLinkProcessing {
-    
+    //TODO: pass event to JS layer
 }
 
 
