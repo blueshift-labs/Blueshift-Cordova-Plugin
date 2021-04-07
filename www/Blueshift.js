@@ -197,3 +197,85 @@ exports.registerForRemoteNotification = function () {
 exports.setCurrentLocation = function (latitude, longitude) {
     exec(null, null, 'Blueshift', 'setCurrentLocation', [latitude,longitude]);
 };
+
+/**
+ * Get opt-in or opt-out status of in-app notifications set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getEnableInAppStatus = function (success) {
+    exec(success, null, 'Blueshift', 'getEnableInAppStatus', []);
+};
+
+/**
+ * Get opt-in or opt-out status of push notifications set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getEnablePushStatus = function (success) {
+    exec(success, null, 'Blueshift', 'getEnablePushStatus', []);
+};
+
+/**
+ * Get status of event tracking set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getEnableTrackingStatus = function (success) {
+    exec(success, null, 'Blueshift', 'getEnableTrackingStatus', []);
+};
+
+/**
+ * Get email id string set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getUserInfoEmailID = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoEmailID', []);
+};
+
+/**
+ * Get customer id string set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getUserInfoCustomerID = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoCustomerID', []);
+};
+
+/**
+ * Get first name string set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getUserInfoFirstname = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoFirstname', []);
+};
+
+/**
+ * Get last name string set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getUserInfoLastname = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoLastname', []);
+};
+
+/**
+ * Get extras JSON data set in the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getUserInfoExtras = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoExtras', []);
+};
+
+/**
+ * Get current device id string used by the SDK.
+ *
+ * @param {function} success success callback.
+ */
+exports.getCurrentDeviceId = function (success) {
+    exec(success, null, 'Blueshift', 'getCurrentDeviceId', []);
+};
+

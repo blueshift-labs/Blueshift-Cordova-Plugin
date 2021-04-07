@@ -41,4 +41,14 @@
 - (void)registerForRemoteNotification:(CDVInvokedUrlCommand*)command;
 - (void)setCurrentLocation:(CDVInvokedUrlCommand*)command;
 
+// Getter methods
+- (void)getEnableInAppStatus:(CDVInvokedUrlCommand*)command;
+- (void)getEnablePushStatus:(CDVInvokedUrlCommand*)command;
+- (void)getEnableTrackingStatus:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoEmailID:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoCustomerID:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoFirstname:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoLastname:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoExtras:(CDVInvokedUrlCommand*)command;
+- (void)getCurrentDeviceId:(CDVInvokedUrlCommand*)command;
 @end

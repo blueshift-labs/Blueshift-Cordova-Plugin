@@ -250,10 +250,16 @@ static dispatch_queue_t bsft_serial_queue() {
         [self runOnSerialQueue:^{
             CDVPluginResult* pluginResult = nil;
             NSString* eventName = (NSString*)[command.arguments objectAtIndex:0];
-            NSDictionary* eventParams = (NSDictionary*)[command.arguments objectAtIndex:1];
-            BOOL isBatch = [[command.arguments objectAtIndex:2] boolValue];
+            NSDictionary* eventParams = nil;
+            BOOL isBatch = NO;
+            if (command.arguments.count > 1) {
+                eventParams = (NSDictionary*)[command.arguments objectAtIndex:1];
+            }
+            if (command.arguments.count > 2) {
+                isBatch = [[command.arguments objectAtIndex:2] boolValue];
+            }
             if (eventName) {
-                if (!eventParams) {
+                if (eventParams && ![eventParams isKindOfClass:[NSDictionary class]]) {
                     eventParams = nil;
                 }
                 [[BlueShift sharedInstance] trackEventForEventName:eventName andParameters:eventParams canBatchThisEvent:isBatch];
@@ -273,8 +279,11 @@ static dispatch_queue_t bsft_serial_queue() {
     if (command.arguments.count > 0) {
         [self runOnSerialQueue:^{
             NSDictionary* eventParams = (NSDictionary*)[command.arguments objectAtIndex:0];
-            BOOL isBatch = [[command.arguments objectAtIndex:1] boolValue];
-            if (!eventParams) {
+            BOOL isBatch = NO;
+            if (command.arguments.count > 1) {
+                isBatch = [[command.arguments objectAtIndex:1] boolValue];
+            }
+            if (eventParams && ![eventParams isKindOfClass:[NSDictionary class]]) {
                 eventParams = nil;
             }
             [[BlueShift sharedInstance] identifyUserWithDetails:eventParams canBatchThisEvent:isBatch];
@@ -353,9 +362,12 @@ static dispatch_queue_t bsft_serial_queue() {
         [self runOnSerialQueue:^{
             NSDictionary* extras = (NSDictionary*)[command.arguments objectAtIndex:0];
             if (extras && [extras isKindOfClass:[NSDictionary class]]) {
-//                [[BlueShiftUserInfo sharedInstance] setExtras:extras];
+                [[BlueShiftUserInfo sharedInstance] setExtras:extras];
                 [[BlueShiftUserInfo sharedInstance] save];
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully set the extras for the user."];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            } else {
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Extras passed are not in valid JSON format. Failed set the extras."];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
             }
         }];
@@ -375,36 +387,61 @@ static dispatch_queue_t bsft_serial_queue() {
 
 #pragma mark: enable/disable SDK functinality
 - (void)enableTracking:(CDVInvokedUrlCommand*)command {
-    [self runOnSerialQueue:^{
-        BOOL isEnabled = [[command.arguments objectAtIndex:0] boolValue];
-        BOOL wipeData = [[command.arguments objectAtIndex:1] boolValue];
-        [[BlueShift sharedInstance] enableTracking:isEnabled andEraseNonSyncedData:wipeData];
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable tracking status."];
+    if (command.arguments.count > 0) {
+        [self runOnSerialQueue:^{
+            BOOL isEnabled = [[command.arguments objectAtIndex:0] boolValue];
+            BOOL wipeData = YES;
+            if (command.arguments.count > 1) {
+                wipeData = [[command.arguments objectAtIndex:1] boolValue];
+            }
+            [[BlueShift sharedInstance] enableTracking:isEnabled andEraseNonSyncedData:wipeData];
+            CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable tracking status."];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the enable tracking status."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    }
 }
 
 - (void)enablePush:(CDVInvokedUrlCommand*)command {
-    [self runOnSerialQueue:^{
-        BOOL isPushEnabled = [[command.arguments objectAtIndex:0] boolValue];
-        [[BlueShiftAppData currentAppData] setEnablePush:isPushEnabled];
-        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable push status."];
+    if (command.arguments.count > 0) {
+        [self runOnSerialQueue:^{
+            BOOL isPushEnabled = [[command.arguments objectAtIndex:0] boolValue];
+            [[BlueShiftAppData currentAppData] setEnablePush:isPushEnabled];
+            CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable push status."];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the enable push status."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }];
+    }
 }
 
-// TODO
 - (void)enableInApp:(CDVInvokedUrlCommand*)command {
-    
+    if (command.arguments.count > 0) {
+        [self runOnSerialQueue:^{
+            BOOL isInAppEnabled = [[command.arguments objectAtIndex:0] boolValue];
+            [[BlueShiftAppData currentAppData] setEnableInApp:isInAppEnabled];
+            CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully updated the enable inApp status."];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed set the enable inApp status."];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
 }
 
 #pragma mark: Live content
 - (void)getLiveContentByEmail:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count > 0) {
         NSString* slot = (NSString*)[command.arguments objectAtIndex:0];
-        NSDictionary* context = (NSDictionary*)[command.arguments objectAtIndex:1];
+        NSDictionary* context = nil;
+        if (command.arguments.count > 1) {
+            context = (NSDictionary*)[command.arguments objectAtIndex:1];
+        }
         if (slot) {
-            if (!context) {
+            if (context && ![context isKindOfClass:[NSDictionary class]]) {
                 context = nil;
             }
             [self runOnSerialQueue:^{
@@ -427,9 +464,12 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getLiveContentByCustomerID:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count > 0) {
         NSString* slot = (NSString*)[command.arguments objectAtIndex:0];
-        NSDictionary* context = (NSDictionary*)[command.arguments objectAtIndex:1];
+        NSDictionary* context = nil;
+        if (command.arguments.count > 1) {
+            context = (NSDictionary*)[command.arguments objectAtIndex:1];
+        }
         if (slot) {
-            if (!context) {
+            if (context && ![context isKindOfClass:[NSDictionary class]]) {
                 context = nil;
             }
             [self runOnSerialQueue:^{
@@ -452,16 +492,18 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getLiveContentByDeviceID:(CDVInvokedUrlCommand*)command {
     if (command.arguments.count > 0) {
         NSString* slot = (NSString*)[command.arguments objectAtIndex:0];
-        NSDictionary* context = (NSDictionary*)[command.arguments objectAtIndex:1];
+        NSDictionary* context = nil;
+        if (command.arguments.count > 1) {
+            context = (NSDictionary*)[command.arguments objectAtIndex:1];
+        }
         if (slot) {
-            if (!context) {
+            if (context && ![context isKindOfClass:[NSDictionary class]]) {
                 context = nil;
             }
             [self runOnSerialQueue:^{
                 [BlueShiftLiveContent fetchLiveContentByDeviceID:slot withContext:context success:^(NSDictionary * data) {
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-                    
                 } failure:^(NSError * error) {
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"API failed to fetch live content using device Id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -504,6 +546,79 @@ static dispatch_queue_t bsft_serial_queue() {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set location."];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
+}
+
+#pragma mark: Getter methods
+
+- (void)getEnableInAppStatus:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        BOOL isEnabled = [BlueShiftAppData currentAppData].enableInApp;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getEnablePushStatus:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        BOOL isEnabled = [BlueShiftAppData currentAppData].enablePush;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getEnableTrackingStatus:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        BOOL isEnabled = [BlueShift sharedInstance].isTrackingEnabled;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isEnabled];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+- (void)getUserInfoEmailID:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        NSString* emailId = [BlueShiftUserInfo sharedInstance].email;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:emailId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getUserInfoCustomerID:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        NSString* customerId = [BlueShiftUserInfo sharedInstance].retailerCustomerID;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:customerId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getUserInfoFirstname:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        NSString* firstName = [BlueShiftUserInfo sharedInstance].firstName;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:firstName];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getUserInfoLastname:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        NSString* lastName = [BlueShiftUserInfo sharedInstance].lastName;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:lastName];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getUserInfoExtras:(CDVInvokedUrlCommand*)command {
+    [self runOnSerialQueue:^{
+        NSDictionary* extras = [BlueShiftUserInfo sharedInstance].extras;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:extras];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
+- (void)getCurrentDeviceId:(CDVInvokedUrlCommand*)command  {
+    [self runOnSerialQueue:^{
+        NSString* deviceId = [BlueShiftDeviceData currentDeviceData].deviceUUID;
+        CDVPluginResult*  pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
 }
 
 #pragma mark: Serial queue
