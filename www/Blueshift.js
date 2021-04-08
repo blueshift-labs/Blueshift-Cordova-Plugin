@@ -248,8 +248,8 @@ exports.getUserInfoCustomerID = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoFirstname = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoFirstname', []);
+exports.getUserInfoFirstName = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoFirstName', []);
 };
 
 /**
@@ -257,8 +257,8 @@ exports.getUserInfoFirstname = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoLastname = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoLastname', []);
+exports.getUserInfoLastName = function (success) {
+    exec(success, null, 'Blueshift', 'getUserInfoLastName', []);
 };
 
 /**
