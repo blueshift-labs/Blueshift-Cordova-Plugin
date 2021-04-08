@@ -57,10 +57,16 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
 
+    // todo: match this to that of iOS
     private static final String ON_DEEP_LINK = "OnDeepLink";
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
+
+    private void fireDocumentEventForDeepLink(String deeplink) {
+        String json = "{'deeplink':'" + deeplink + "'}";
+        fireDocumentEvent(ON_DEEP_LINK, json);
+    }
 
     private void fireDocumentEvent(String event, String extras) {
         if (event != null && extras != null) {
@@ -78,18 +84,12 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             // Check for deeplink URL that came via VIEW intent.
             Uri deeplink = intent.getData();
-            if (deeplink != null) {
-                String json = "{'deeplink':'" + deeplink.toString() + "'}";
-                fireDocumentEvent(ON_DEEP_LINK, json);
-            }
+            if (deeplink != null) fireDocumentEventForDeepLink(deeplink.toString());
         } else if (intent.getExtras() != null
                 && intent.getExtras().containsKey(RichPushConstants.EXTRA_DEEP_LINK_URL)) {
             // This is check for deeplink URL from push notifications.
             String deeplink = intent.getStringExtra(RichPushConstants.EXTRA_DEEP_LINK_URL);
-            if (deeplink != null) {
-                String json = "{'deeplink':'" + deeplink + "'}";
-                fireDocumentEvent(ON_DEEP_LINK, json);
-            }
+            if (deeplink != null) fireDocumentEventForDeepLink(deeplink);
         }
     }
 
@@ -715,16 +715,18 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
-    private boolean setUserInfoExtras(JSONArray args) throws JSONException {
+    private boolean setUserInfoExtras(JSONArray args) {
         JSONObject extras = getJSONObject(args, 0);
 
         Log.d(TAG, "setUserInfoExtras: " + extras);
 
-        UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
-        if (userInfo != null) {
-            userInfo.setDetails(getMap(extras));
-            userInfo.save(cordova.getContext());
-        }
+        cordova.getThreadPool().submit(() -> {
+            UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
+            if (userInfo != null) {
+                userInfo.setDetails(getMap(extras));
+                userInfo.save(cordova.getContext());
+            }
+        });
 
         return true;
     }
@@ -732,11 +734,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean removeUserInfo() {
         Log.d(TAG, "removeUserInfo: ");
 
-        UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
-        if (userInfo != null) {
-            // TODO clear user info
-            userInfo.save(cordova.getContext());
-        }
+        cordova.getThreadPool().submit(() -> {
+            UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
+            if (userInfo != null) {
+                // TODO clear user info
+                userInfo.save(cordova.getContext());
+            }
+        });
 
         return true;
     }
