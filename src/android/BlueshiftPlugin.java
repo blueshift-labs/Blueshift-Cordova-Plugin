@@ -474,60 +474,48 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean getUserInfoEmailID(CallbackContext callbackContext) {
-        Log.d(TAG, "getUserInfoEmailID: ");
-
         if (callbackContext != null) {
             UserInfo userInfo = UserInfo.getInstance(mAppContext);
-            if (userInfo != null) {
-                callbackContext.success(userInfo.getEmail());
-            } else {
-                callbackContext.success("");
-            }
+            String email = userInfo != null ? userInfo.getEmail() : "";
+            callbackContext.success(email);
+
+            Log.d(TAG, "getUserInfoEmailID: " + email);
         }
 
         return true;
     }
 
     private boolean getUserInfoCustomerID(CallbackContext callbackContext) {
-        Log.d(TAG, "getUserInfoCustomerID: ");
-
         if (callbackContext != null) {
             UserInfo userInfo = UserInfo.getInstance(mAppContext);
-            if (userInfo != null) {
-                callbackContext.success(userInfo.getRetailerCustomerId());
-            } else {
-                callbackContext.success("");
-            }
+            String customerId = userInfo != null ? userInfo.getRetailerCustomerId() : "";
+            callbackContext.success(customerId);
+
+            Log.d(TAG, "getUserInfoCustomerID: " + customerId);
         }
 
         return true;
     }
 
     private boolean getUserInfoFirstName(CallbackContext callbackContext) {
-        Log.d(TAG, "getUserInfoFirstName: ");
-
         if (callbackContext != null) {
             UserInfo userInfo = UserInfo.getInstance(mAppContext);
-            if (userInfo != null) {
-                callbackContext.success(userInfo.getFirstname());
-            } else {
-                callbackContext.success("");
-            }
+            String firstName = userInfo != null ? userInfo.getFirstname() : "";
+            callbackContext.success(firstName);
+
+            Log.d(TAG, "getUserInfoFirstName: " + firstName);
         }
 
         return true;
     }
 
     private boolean getUserInfoLastName(CallbackContext callbackContext) {
-        Log.d(TAG, "getUserInfoLastName: ");
-
         if (callbackContext != null) {
             UserInfo userInfo = UserInfo.getInstance(mAppContext);
-            if (userInfo != null) {
-                callbackContext.success(userInfo.getLastname());
-            } else {
-                callbackContext.success("");
-            }
+            String lastName = userInfo != null ? userInfo.getLastname() : "";
+            callbackContext.success(lastName);
+
+            Log.d(TAG, "getUserInfoLastName: " + lastName);
         }
 
         return true;
@@ -535,16 +523,18 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
 
     private boolean getUserInfoExtras(CallbackContext callbackContext) {
-        Log.d(TAG, "getUserInfoExtras: ");
-
         if (callbackContext != null) {
             UserInfo userInfo = UserInfo.getInstance(mAppContext);
             if (userInfo != null) {
                 HashMap<String, Object> extraMap = userInfo.getDetails();
                 JSONObject jsonObject = getJSONObject(extraMap);
                 callbackContext.success(jsonObject);
+
+                Log.d(TAG, "getUserInfoExtras: " + jsonObject.toString());
             } else {
                 callbackContext.success(new JSONObject());
+
+                Log.d(TAG, "getUserInfoExtras: {}");
             }
         }
 
@@ -559,33 +549,33 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean getEnablePushStatus(CallbackContext callbackContext) {
-        Log.d(TAG, "getEnablePushStatus: ");
-
         if (callbackContext != null) {
             boolean isEnabled = BlueshiftAppPreferences.getInstance(mAppContext).getEnablePush();
-            callbackContext.success(String.valueOf(isEnabled));
+            callbackContext.success(isEnabled ? 1 : 0);
+
+            Log.d(TAG, "getEnablePushStatus: " + isEnabled);
         }
 
         return true;
     }
 
     private boolean getEnableTrackingStatus(CallbackContext callbackContext) {
-        Log.d(TAG, "getEnableTrackingStatus: ");
-
         if (callbackContext != null) {
             boolean isEnabled = Blueshift.isTrackingEnabled(mAppContext);
-            callbackContext.success(String.valueOf(isEnabled));
+            callbackContext.success(isEnabled ? 1 : 0);
+
+            Log.d(TAG, "getEnableTrackingStatus: " + isEnabled);
         }
 
         return true;
     }
 
     private boolean getCurrentDeviceId(CallbackContext callbackContext) {
-        Log.d(TAG, "getCurrentDeviceId: ");
-
         if (callbackContext != null) {
             String deviceId = DeviceUtils.getDeviceId(mAppContext);
             callbackContext.success(deviceId);
+
+            Log.d(TAG, "getCurrentDeviceId: " + deviceId);
         }
 
         return true;
