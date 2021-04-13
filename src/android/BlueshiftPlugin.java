@@ -1,6 +1,8 @@
 package com.blueshift.cordova;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.blueshift.Blueshift;
@@ -8,6 +10,8 @@ import com.blueshift.BlueshiftAppPreferences;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.Configuration;
 import com.blueshift.model.UserInfo;
+import com.blueshift.rich_push.RichPushConstants;
+import com.blueshift.util.DeviceUtils;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -17,6 +21,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -26,7 +31,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     /**
      * The below keys can be used for specifying the config values in the form of preferences.
-     *
+     * <p>
      * Ex:
      * <preference name="com.blueshift.config.in_app_enabled" value="true"/>
      */
@@ -52,18 +57,51 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
 
+    // todo: match this to that of iOS
+    private static final String ON_DEEP_LINK = "OnDeepLink";
+
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
 
-    private int getDrawableResId(String drawableName) {
-        return getResIdFromString(drawableName, "drawable");
+    private void fireDocumentEventForDeepLink(String deeplink) {
+        String json = "{'deeplink':'" + deeplink + "'}";
+        fireDocumentEvent(ON_DEEP_LINK, json);
     }
 
-    private int getColorResId(String colorName) {
-        return getResIdFromString(colorName, "color");
+    private void fireDocumentEvent(String event, String extras) {
+        if (event != null && extras != null) {
+            String jsCode = "javascript:cordova.fireDocumentEvent('" + event + "'," + extras + ");";
+            this.cordova.getActivity().runOnUiThread(
+                    () -> webView.loadUrl(jsCode)
+            );
+        }
     }
 
-    private int getResIdFromString(String variableName, String resourceName) {
+    @Override
+    public void onNewIntent(Intent intent) {
+        if (intent == null) return;
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            // Check for deeplink URL that came via VIEW intent.
+            Uri deeplink = intent.getData();
+            if (deeplink != null) fireDocumentEventForDeepLink(deeplink.toString());
+        } else if (intent.getExtras() != null
+                && intent.getExtras().containsKey(RichPushConstants.EXTRA_DEEP_LINK_URL)) {
+            // This is check for deeplink URL from push notifications.
+            String deeplink = intent.getStringExtra(RichPushConstants.EXTRA_DEEP_LINK_URL);
+            if (deeplink != null) fireDocumentEventForDeepLink(deeplink);
+        }
+    }
+
+    private int getColorResourceId(String colorName) {
+        return getResourceIdFromString(colorName, "color");
+    }
+
+    private int getDrawableResourceId(String drawableName) {
+        return getResourceIdFromString(drawableName, "drawable");
+    }
+
+    private int getResourceIdFromString(String variableName, String resourceName) {
         return mAppContext
                 .getResources()
                 .getIdentifier(variableName, resourceName, mAppContext.getPackageName());
@@ -128,7 +166,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private void setAppIcon(Configuration configuration) {
         if (this.preferences.contains(BLUESHIFT_PREF_APP_ICON)) {
             String drawableName = this.preferences.getString(BLUESHIFT_PREF_APP_ICON, null);
-            if (drawableName != null) configuration.setAppIcon(getDrawableResId(drawableName));
+            if (drawableName != null) configuration.setAppIcon(getDrawableResourceId(drawableName));
 
             logPreferenceValue(BLUESHIFT_PREF_APP_ICON, drawableName);
         } else {
@@ -206,7 +244,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_COLOR)) {
             String colorName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_COLOR, null);
             if (colorName != null) {
-                int colorResId = getColorResId(colorName);
+                int colorResId = getColorResourceId(colorName);
                 int colorValue = mAppContext.getResources().getColor(colorResId);
                 configuration.setNotificationColor(colorValue);
             }
@@ -221,7 +259,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL)) {
             String drawableName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL, null);
             if (drawableName != null)
-                configuration.setSmallIconResId(getDrawableResId(drawableName));
+                configuration.setSmallIconResId(getDrawableResourceId(drawableName));
 
             logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_ICON_SMALL, drawableName);
         } else {
@@ -233,7 +271,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE)) {
             String drawableName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE, null);
             if (drawableName != null)
-                configuration.setLargeIconResId(getDrawableResId(drawableName));
+                configuration.setLargeIconResId(getDrawableResourceId(drawableName));
 
             logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_ICON_LARGE, drawableName);
         } else {
@@ -355,38 +393,192 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        // IN APP MESSAGES
-        if (action.equals("registerForInAppMessages")) return registerForInAppMessages(args);
-        if (action.equals("unregisterForInAppMessages")) return unregisterForInAppMessages();
-        if (action.equals("fetchInAppMessages")) return fetchInAppMessages(callbackContext);
-        if (action.equals("displayInAppMessages")) return displayInAppMessages();
+        if (action != null) {
+            switch (action) {
+                // IN-APP
+                case "registerForInAppMessages":
+                    return registerForInAppMessages(args);
+                case "unregisterForInAppMessages":
+                    return unregisterForInAppMessages();
+                case "fetchInAppMessages":
+                    return fetchInAppMessages(callbackContext);
+                case "displayInAppMessages":
+                    return displayInAppMessages();
 
-        // EVENTS
-        if (action.equals("trackCustomEvent")) return trackCustomEvent(args);
-        if (action.equals("identify")) return identify(args);
+                // EVENTS
+                case "trackCustomEvent":
+                    return trackCustomEvent(args);
+                case "identify":
+                    return identify(args);
 
-        // USER INFO
-        if (action.equals("setUserInfoEmailID")) return setUserInfoEmailID(args);
-        if (action.equals("setUserInfoCustomerID")) return setUserInfoCustomerID(args);
-        if (action.equals("setUserInfoFirstName")) return setUserInfoFirstName(args);
-        if (action.equals("setUserInfoLastName")) return setUserInfoLastName(args);
-        if (action.equals("setUserInfoExtras")) return setUserInfoExtras(args);
-        if (action.equals("removeUserInfo")) return removeUserInfo();
+                // USER INFO SETTERS
+                case "setUserInfoEmailID":
+                    return setUserInfoEmailID(args);
+                case "setUserInfoCustomerID":
+                    return setUserInfoCustomerID(args);
+                case "setUserInfoFirstName":
+                    return setUserInfoFirstName(args);
+                case "setUserInfoLastName":
+                    return setUserInfoLastName(args);
+                case "setUserInfoExtras":
+                    return setUserInfoExtras(args);
+                case "removeUserInfo":
+                    return removeUserInfo();
 
-        // LIVE CONTENT
-        if (action.equals("getLiveContentByEmail"))
-            return getLiveContentByEmail(args, callbackContext);
-        if (action.equals("getLiveContentByCustomerID"))
-            return getLiveContentByCustomerID(args, callbackContext);
-        if (action.equals("getLiveContentByDeviceID"))
-            return getLiveContentByDeviceID(args, callbackContext);
+                // LIVE CONTENT
+                case "getLiveContentByEmail":
+                    return getLiveContentByEmail(args, callbackContext);
+                case "getLiveContentByCustomerID":
+                    return getLiveContentByCustomerID(args, callbackContext);
+                case "getLiveContentByDeviceID":
+                    return getLiveContentByDeviceID(args, callbackContext);
 
-        // OPT IN/OUT
-        if (action.equals("enableTracking")) return enableTracking(args);
-        if (action.equals("enablePush")) return enablePush(args);
-        if (action.equals("enableInApp")) return enableInApp(args);
+                // OPT IN/OUT SETTERS
+                case "enableTracking":
+                    return enableTracking(args);
+                case "enablePush":
+                    return enablePush(args);
+                case "enableInApp":
+                    return enableInApp(args);
+
+                // USER INFO GETTERS
+                case "getUserInfoEmailID":
+                    return getUserInfoEmailID(callbackContext);
+                case "getUserInfoCustomerID":
+                    return getUserInfoCustomerID(callbackContext);
+                case "getUserInfoFirstName":
+                    return getUserInfoFirstName(callbackContext);
+                case "getUserInfoLastName":
+                    return getUserInfoLastName(callbackContext);
+                case "getUserInfoExtras":
+                    return getUserInfoExtras(callbackContext);
+
+                // OPT IN/OUT GETTERS
+                case "getEnableInAppStatus":
+                    return getEnableInAppStatus(callbackContext);
+                case "getEnablePushStatus":
+                    return getEnablePushStatus(callbackContext);
+                case "getEnableTrackingStatus":
+                    return getEnableTrackingStatus(callbackContext);
+
+                // OTHER GETTERS
+                case "getCurrentDeviceId":
+                    return getCurrentDeviceId(callbackContext);
+
+                default:
+                    Log.d(TAG, "Unknown action. " + action);
+            }
+        }
 
         return false;
+    }
+
+    private boolean getUserInfoEmailID(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            UserInfo userInfo = UserInfo.getInstance(mAppContext);
+            String email = userInfo != null ? userInfo.getEmail() : "";
+            callbackContext.success(email);
+
+            Log.d(TAG, "getUserInfoEmailID: " + email);
+        }
+
+        return true;
+    }
+
+    private boolean getUserInfoCustomerID(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            UserInfo userInfo = UserInfo.getInstance(mAppContext);
+            String customerId = userInfo != null ? userInfo.getRetailerCustomerId() : "";
+            callbackContext.success(customerId);
+
+            Log.d(TAG, "getUserInfoCustomerID: " + customerId);
+        }
+
+        return true;
+    }
+
+    private boolean getUserInfoFirstName(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            UserInfo userInfo = UserInfo.getInstance(mAppContext);
+            String firstName = userInfo != null ? userInfo.getFirstname() : "";
+            callbackContext.success(firstName);
+
+            Log.d(TAG, "getUserInfoFirstName: " + firstName);
+        }
+
+        return true;
+    }
+
+    private boolean getUserInfoLastName(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            UserInfo userInfo = UserInfo.getInstance(mAppContext);
+            String lastName = userInfo != null ? userInfo.getLastname() : "";
+            callbackContext.success(lastName);
+
+            Log.d(TAG, "getUserInfoLastName: " + lastName);
+        }
+
+        return true;
+    }
+
+
+    private boolean getUserInfoExtras(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            UserInfo userInfo = UserInfo.getInstance(mAppContext);
+            if (userInfo != null) {
+                HashMap<String, Object> extraMap = userInfo.getDetails();
+                JSONObject jsonObject = getJSONObject(extraMap);
+                callbackContext.success(jsonObject);
+
+                Log.d(TAG, "getUserInfoExtras: " + jsonObject.toString());
+            } else {
+                callbackContext.success(new JSONObject());
+
+                Log.d(TAG, "getUserInfoExtras: {}");
+            }
+        }
+
+        return true;
+    }
+
+    private boolean getEnableInAppStatus(CallbackContext callbackContext) {
+        Log.d(TAG, "getEnableInAppStatus: ");
+
+        // Todo: implement the code.
+        return true;
+    }
+
+    private boolean getEnablePushStatus(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            boolean isEnabled = BlueshiftAppPreferences.getInstance(mAppContext).getEnablePush();
+            callbackContext.success(isEnabled ? 1 : 0);
+
+            Log.d(TAG, "getEnablePushStatus: " + isEnabled);
+        }
+
+        return true;
+    }
+
+    private boolean getEnableTrackingStatus(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            boolean isEnabled = Blueshift.isTrackingEnabled(mAppContext);
+            callbackContext.success(isEnabled ? 1 : 0);
+
+            Log.d(TAG, "getEnableTrackingStatus: " + isEnabled);
+        }
+
+        return true;
+    }
+
+    private boolean getCurrentDeviceId(CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            String deviceId = DeviceUtils.getDeviceId(mAppContext);
+            callbackContext.success(deviceId);
+
+            Log.d(TAG, "getCurrentDeviceId: " + deviceId);
+        }
+
+        return true;
     }
 
     private boolean registerForInAppMessages(JSONArray args) throws JSONException {
@@ -513,16 +705,18 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
-    private boolean setUserInfoExtras(JSONArray args) throws JSONException {
+    private boolean setUserInfoExtras(JSONArray args) {
         JSONObject extras = getJSONObject(args, 0);
 
         Log.d(TAG, "setUserInfoExtras: " + extras);
 
-        UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
-        if (userInfo != null) {
-            userInfo.setDetails(getMap(extras));
-            userInfo.save(cordova.getContext());
-        }
+        cordova.getThreadPool().submit(() -> {
+            UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
+            if (userInfo != null) {
+                userInfo.setDetails(getMap(extras));
+                userInfo.save(cordova.getContext());
+            }
+        });
 
         return true;
     }
@@ -530,11 +724,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean removeUserInfo() {
         Log.d(TAG, "removeUserInfo: ");
 
-        UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
-        if (userInfo != null) {
-            // TODO clear user info
-            userInfo.save(cordova.getContext());
-        }
+        cordova.getThreadPool().submit(() -> {
+            UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
+            if (userInfo != null) {
+                // TODO clear user info
+                userInfo.save(cordova.getContext());
+            }
+        });
 
         return true;
     }
@@ -635,5 +831,21 @@ public class BlueshiftPlugin extends CordovaPlugin {
         }
 
         return null;
+    }
+
+    JSONObject getJSONObject(HashMap<String, Object> map) {
+        JSONObject jsonObject = new JSONObject();
+
+        if (map != null) {
+            for (Map.Entry<String, Object> e : map.entrySet()) {
+                try {
+                    jsonObject.put(e.getKey(), e.getValue());
+                } catch (JSONException jsonException) {
+                    Log.e(TAG, "getJson: ", jsonException);
+                }
+            }
+        }
+
+        return jsonObject;
     }
 }
