@@ -51,7 +51,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_NOTIFICATION_CHANNEL_DESCRIPTION = "com.blueshift.config.notification_channel_description";
     private static final String BLUESHIFT_PREF_DEVICE_ID_SOURCE = "com.blueshift.config.device_id_source";
     private static final String BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE = "com.blueshift.config.device_id_custom_value";
-    private static final String BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS = "com.blueshift.config.batch_interval_milliseconds";
+    private static final String BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS = "com.blueshift.config.batch_interval_seconds";
     private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED = "com.blueshift.config.auto_app_open_enabled";
     private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS = "com.blueshift.config.auto_app_open_interval_seconds";
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
@@ -337,13 +337,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private void setBatchInterval(Configuration configuration) {
-        if (this.preferences.contains(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS)) {
-            int interval = this.preferences.getInteger(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS, -1);
-            if (interval >= 0) configuration.setBatchInterval(interval);
+        if (this.preferences.contains(BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS)) {
+            int interval = this.preferences.getInteger(BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS, -1);
+            if (interval >= 0) configuration.setBatchInterval(interval * 1000);
 
-            logPreferenceValue(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS, interval);
+            logPreferenceValue(BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS, interval);
         } else {
-            logMissingPreference(BLUESHIFT_PREF_BATCH_INTERVAL_MILLISECONDS);
+            logMissingPreference(BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS);
         }
     }
 
