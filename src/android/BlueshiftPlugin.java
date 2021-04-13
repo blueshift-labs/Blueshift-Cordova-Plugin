@@ -1,5 +1,6 @@
 package com.blueshift.cordova;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -66,36 +67,29 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
 
-    /**
-     * Invoke this method from the last line of your MainActivity.onCreate() method to handle the
-     * deep links from Blueshift push notification clicks.
-     *
-     * @param activity valid {@link CordovaActivity} instance
-     * @param appView  valid {@link CordovaWebView} instance
-     */
-    public static void openBlueshiftPushDeepLinks(CordovaActivity activity, CordovaWebView appView) {
+    private String documentEventJs(String event, String json) {
+        return "javascript:cordova.fireDocumentEvent('" + event + "'," + json + ");";
+    }
+
+    private String deepLinkDocumentEventJSON(String deepLink) {
+        return "{'deeplink':'" + deepLink + "'}";
+    }
+
+    private void fireDocumentEventForDeepLink(String deeplink, CordovaWebView webView) {
+        if (webView != null) {
+            String json = deepLinkDocumentEventJSON(deeplink);
+            String jsCode = documentEventJs(ON_DEEP_LINK, json);
+            webView.getView().post(() -> webView.loadUrl(jsCode));
+        }
+    }
+
+    private void openBlueshiftPushDeepLinks(Activity activity, CordovaWebView appView) {
         if (activity != null && activity.getIntent() != null && appView != null) {
             Bundle bundle = activity.getIntent().getExtras();
             if (bundle != null) {
                 String deeplink = bundle.getString(RichPushConstants.EXTRA_DEEP_LINK_URL, null);
                 if (deeplink != null) fireDocumentEventForDeepLink(deeplink, appView);
             }
-        }
-    }
-
-    private static String documentEventJs(String event, String json) {
-        return "javascript:cordova.fireDocumentEvent('" + event + "'," + json + ");";
-    }
-
-    private static String deepLinkDocumentEventJSON(String deepLink) {
-        return "{'deeplink':'" + deepLink + "'}";
-    }
-
-    private static void fireDocumentEventForDeepLink(String deeplink, CordovaWebView webView) {
-        if (webView != null) {
-            String json = deepLinkDocumentEventJSON(deeplink);
-            String jsCode = documentEventJs(ON_DEEP_LINK, json);
-            webView.getView().post(() -> webView.loadUrl(jsCode));
         }
     }
 
@@ -136,6 +130,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
         mBlueshift = Blueshift.getInstance(mAppContext);
 
         initBlueshiftWithConfig();
+
+        // check for the Blueshift deep links coming from push click
+        openBlueshiftPushDeepLinks(this.cordova.getActivity(), this.webView);
     }
 
     private void initBlueshiftWithConfig() {
