@@ -4,6 +4,7 @@
 //
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
+#define BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION @"BlueshiftHandleDeepLinkNotification"
 
 #import <BlueShift_iOS_SDK/BlueShift.h>
 
@@ -40,6 +41,7 @@
 // Remote notification & Location
 - (void)registerForRemoteNotification:(CDVInvokedUrlCommand*)command;
 - (void)setCurrentLocation:(CDVInvokedUrlCommand*)command;
+- (void)setIDFA:(CDVInvokedUrlCommand*)command;
 
 // Getter methods
 - (void)getEnableInAppStatus:(CDVInvokedUrlCommand*)command;
@@ -47,8 +49,8 @@
 - (void)getEnableTrackingStatus:(CDVInvokedUrlCommand*)command;
 - (void)getUserInfoEmailID:(CDVInvokedUrlCommand*)command;
 - (void)getUserInfoCustomerID:(CDVInvokedUrlCommand*)command;
-- (void)getUserInfoFirstname:(CDVInvokedUrlCommand*)command;
-- (void)getUserInfoLastname:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoFirstName:(CDVInvokedUrlCommand*)command;
+- (void)getUserInfoLastName:(CDVInvokedUrlCommand*)command;
 - (void)getUserInfoExtras:(CDVInvokedUrlCommand*)command;
 - (void)getCurrentDeviceId:(CDVInvokedUrlCommand*)command;
 @end
