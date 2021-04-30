@@ -531,7 +531,7 @@ static dispatch_queue_t bsft_serial_queue() {
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                     
                 } failure:^(NSError * error) {
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.debugDescription];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch live content using email id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }];
             }];
@@ -558,7 +558,7 @@ static dispatch_queue_t bsft_serial_queue() {
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 } failure:^(NSError * error) {
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.debugDescription];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch live content using customer id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }];
             }];
@@ -585,7 +585,7 @@ static dispatch_queue_t bsft_serial_queue() {
                     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 } failure:^(NSError * error) {
-                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:error.debugDescription];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch live content using device id."];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
                 }];
             }];
@@ -749,7 +749,7 @@ static dispatch_queue_t bsft_serial_queue() {
 
 - (void)didFailLinkProcessingWithError: (NSError *_Nullable)error url:(NSURL *_Nullable)url {
     if (url) {
-        NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@','%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString, BLUESHIFT_ERROR_ATTRIBUTE, error.debugDescription];
+        NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@','%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString, BLUESHIFT_ERROR_ATTRIBUTE, error.localizedDescription];
         if (isPageLoaded == YES) {
             [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_FAIL additionalInfo:additionalInfo];
         } else {
