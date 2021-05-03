@@ -64,7 +64,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     // JS Event Names for Deeplink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
-    private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS = "OnBlueshiftDeepLinkReplaySuccess";
+    private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS = "OnBlueshiftDeepLinkSuccess";
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL = "OnBlueshiftDeepLinkReplayFail";
 
     // JS Event Params for Deeplink
@@ -800,10 +800,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         cordova.getThreadPool().submit(() -> {
             UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
-            if (userInfo != null) {
-                userInfo.clear(cordova.getContext());
-                userInfo.save(cordova.getContext());
-            }
+            if (userInfo != null) userInfo.clear(cordova.getContext());
         });
 
         return true;
