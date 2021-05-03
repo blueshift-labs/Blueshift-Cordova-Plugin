@@ -7,15 +7,15 @@
     "files": {}
   },
   "installed_plugins": {
+    "blueshift-cordova-plugin": {
+      "BSFT_EVENT_API_KEY": "YOUR API KEY",
+      "PACKAGE_NAME": "com.blueshift.reads"
+    },
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "com.blueshift.reads"
     },
     "@globules-io/cordova-plugin-ios-xhr": {
-      "PACKAGE_NAME": "com.blueshift.reads.notificationContent"
-    },
-    "blueshift-cordova-plugin": {
-      "BSFT_EVENT_API_KEY": "5dfe3c9aee8b375bcc616079b08156d9",
-      "PACKAGE_NAME": "com.blueshift.reads.notificationContent"
+      "PACKAGE_NAME": "com.blueshift.reads"
     }
   },
   "dependent_plugins": {}

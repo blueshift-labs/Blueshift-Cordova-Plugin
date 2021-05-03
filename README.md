@@ -87,13 +87,9 @@ Default value: set by the SDK. -->
 <preference name="com.blueshift.config.notification_channel_description" value="notification_channel_description"/>
 
 <!-- Tells the SDK to set a device id source. Supported values are, 
-ADVERTISING_ID, INSTANCE_ID, GUID, ADVERTISING_ID_PKG_NAME, INSTANCE_ID_PKG_NAME, CUSTOM.
+ADVERTISING_ID, INSTANCE_ID, GUID, ADVERTISING_ID_PKG_NAME, INSTANCE_ID_PKG_NAME.
 Default value: ADVERTISING_ID. -->
-<preference name="com.blueshift.config.device_id_source" value="CUSTOM"/>
-
-<!-- Tells the SDK to set a custom device id of host app's choice.
-The value is accepted only when the device id source is CUSTOM. -->
-<preference name="com.blueshift.config.device_id_custom_value" value="21c6e45f-8f31-4bd3-8ec8-a841ac95d010"/>
+<preference name="com.blueshift.config.device_id_source" value="INSTANCE_ID"/>
 
 <!-- Tells the SDK to set a custom batch interval.
 Default value: 1800 (30 minutes). -->
@@ -148,8 +144,7 @@ Default value: false -->
 <preference name="com.blueshift.config.in_app_manual_mode_enabled" value="false"/>
 
 <!-- Tells the SDK to set a device id source. Supported values are, 
-BlueshiftDeviceIdSourceIDFV, BlueshiftDeviceIdSourceUUID, BlueshiftDeviceIdSourceIDFVBundleID,
-BlueshiftDeviceIdSourceCustom.
+BlueshiftDeviceIdSourceIDFV, BlueshiftDeviceIdSourceUUID, BlueshiftDeviceIdSourceIDFVBundleID.
 Default value: BlueshiftDeviceIdSourceIDFV. -->
 <preference name="com.blueshift.config.device_id_source" value="BlueshiftDeviceIdSourceUUID"/>
 
