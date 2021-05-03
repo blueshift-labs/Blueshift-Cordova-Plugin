@@ -1,19 +1,19 @@
-var exec = require('cordova/exec');
-
+var Blueshift = function () {
+}
 /**
 * Registers a page for showing in-app message.
 *
 * @param {String} screenName    Name of the screen.
 */
-exports.registerForInAppMessages = function (screenName) {
-    exec(null, null, 'Blueshift', 'registerForInAppMessages', [screenName]);
+Blueshift.prototype.registerForInAppMessages = function (screenName) {
+    cordova.exec(null, null, 'Blueshift', 'registerForInAppMessages', [screenName]);
 };
 
 /**
 * Unregisters a page from showing in-app message.
 */
-exports.unregisterForInAppMessages = function () {
-    exec(null, null, 'Blueshift', 'unregisterForInAppMessages', []);
+Blueshift.prototype.unregisterForInAppMessages = function () {
+    cordova.exec(null, null, 'Blueshift', 'unregisterForInAppMessages', []);
 };
 
 /**
@@ -22,15 +22,15 @@ exports.unregisterForInAppMessages = function () {
 * @param {function} success    Success callback with the in-app API response.
 * @param {function} error      Error callback with an error message.
 */
-exports.fetchInAppMessages = function (success, error) {
-    exec(success, error, 'Blueshift', 'fetchInAppMessages', []);
+Blueshift.prototype.fetchInAppMessages = function (success, error) {
+    cordova.exec(success, error, 'Blueshift', 'fetchInAppMessages', []);
 };
 
 /**
 * Display in-app message if the current page is registered for in-app messages.
 */
-exports.displayInAppMessages = function () {
-    exec(null, null, 'Blueshift', 'displayInAppMessages', []);
+Blueshift.prototype.displayInAppMessages = function () {
+    cordova.exec(null, null, 'Blueshift', 'displayInAppMessages', []);
 };
 
 /**
@@ -40,8 +40,8 @@ exports.displayInAppMessages = function () {
 * @param {Object} extras       Additional params (if any).
 * @param {Boolean} canBatch    Tells if this event can be batched or not.
 */
-exports.trackCustomEvent = function (eventName, extras, canBatch) {
-    exec(null, null, 'Blueshift', 'trackCustomEvent', [eventName, extras, canBatch]);
+Blueshift.prototype.trackCustomEvent = function (eventName, extras, canBatch) {
+    cordova.exec(null, null, 'Blueshift', 'trackCustomEvent', [eventName, extras, canBatch]);
 };
 
 /**
@@ -50,8 +50,8 @@ exports.trackCustomEvent = function (eventName, extras, canBatch) {
 * @param {Object} extras   Additional params (if any)
 * @param {String} canBatch Tells if this event can be batched or not.
 */
-exports.identify = function (extras, canBatch) {
-    exec(null, null, 'Blueshift', 'identify', [extras, canBatch]);
+Blueshift.prototype.identify = function (extras, canBatch) {
+    cordova.exec(null, null, 'Blueshift', 'identify', [extras, canBatch]);
 };
 
 /**
@@ -59,8 +59,8 @@ exports.identify = function (extras, canBatch) {
 * 
 * @param {String} email email of the customer.
 */
-exports.setUserInfoEmailID = function (email) {
-    exec(null, null, 'Blueshift', 'setUserInfoEmailID', [email]);
+Blueshift.prototype.setUserInfoEmailID = function (email) {
+    cordova.exec(null, null, 'Blueshift', 'setUserInfoEmailID', [email]);
 };
 
 /**
@@ -68,8 +68,8 @@ exports.setUserInfoEmailID = function (email) {
 * 
 * @param {String} customerId customerId of the customer.
 */
-exports.setUserInfoCustomerID = function (customerId) {
-    exec(null, null, 'Blueshift', 'setUserInfoCustomerID', [customerId]);
+Blueshift.prototype.setUserInfoCustomerID = function (customerId) {
+    cordova.exec(null, null, 'Blueshift', 'setUserInfoCustomerID', [customerId]);
 };
 
 /**
@@ -77,8 +77,8 @@ exports.setUserInfoCustomerID = function (customerId) {
 * 
 * @param {String} firstname firstname of the customer.
 */
-exports.setUserInfoFirstName = function (firstname) {
-    exec(null, null, 'Blueshift', 'setUserInfoFirstName', [firstname]);
+Blueshift.prototype.setUserInfoFirstName = function (firstname) {
+    cordova.exec(null, null, 'Blueshift', 'setUserInfoFirstName', [firstname]);
 };
 
 /**
@@ -86,8 +86,8 @@ exports.setUserInfoFirstName = function (firstname) {
 * 
 * @param {String} lastname lastname of the customer.
 */
-exports.setUserInfoLastName = function (lastname) {
-    exec(null, null, 'Blueshift', 'setUserInfoLastName', [lastname]);
+Blueshift.prototype.setUserInfoLastName = function (lastname) {
+    cordova.exec(null, null, 'Blueshift', 'setUserInfoLastName', [lastname]);
 };
 
 /**
@@ -95,15 +95,15 @@ exports.setUserInfoLastName = function (lastname) {
 * 
 * @param {Object} extras additional user info.
 */
-exports.setUserInfoExtras = function (extras) {
-    exec(null, null, 'Blueshift', 'setUserInfoExtras', [extras]);
+Blueshift.prototype.setUserInfoExtras = function (extras) {
+    cordova.exec(null, null, 'Blueshift', 'setUserInfoExtras', [extras]);
 };
 
 /**
 * Remove all the saved user info from the SDK.
 */
-exports.removeUserInfo = function () {
-    exec(null, null, 'Blueshift', 'removeUserInfo', []);
+Blueshift.prototype.removeUserInfo = function () {
+    cordova.exec(null, null, 'Blueshift', 'removeUserInfo', []);
 };
 
 /**
@@ -114,8 +114,8 @@ exports.removeUserInfo = function () {
 * @param {function} success success callback.
 * @param {function} error error callback.
 */
-exports.getLiveContentByEmail = function (slot, lcContext, success, error) {
-    exec(success, error, 'Blueshift', 'getLiveContentByEmail', [slot, lcContext]);
+Blueshift.prototype.getLiveContentByEmail = function (slot, lcContext, success, error) {
+    cordova.exec(success, error, 'Blueshift', 'getLiveContentByEmail', [slot, lcContext]);
 };
 
 /**
@@ -126,8 +126,8 @@ exports.getLiveContentByEmail = function (slot, lcContext, success, error) {
 * @param {function} success success callback.
 * @param {function} error error callback.
 */
-exports.getLiveContentByCustomerID = function (slot, lcContext, success, error) {
-    exec(success, error, 'Blueshift', 'getLiveContentByCustomerID', [slot, lcContext]);
+Blueshift.prototype.getLiveContentByCustomerID = function (slot, lcContext, success, error) {
+    cordova.exec(success, error, 'Blueshift', 'getLiveContentByCustomerID', [slot, lcContext]);
 };
 
 /**
@@ -138,8 +138,8 @@ exports.getLiveContentByCustomerID = function (slot, lcContext, success, error) 
 * @param {function} success success callback.
 * @param {function} error error callback.
 */
-exports.getLiveContentByDeviceID = function (slot, lcContext, success, error) {
-    exec(success, error, 'Blueshift', 'getLiveContentByDeviceID', [slot, lcContext]);
+Blueshift.prototype.getLiveContentByDeviceID = function (slot, lcContext, success, error) {
+    cordova.exec(success, error, 'Blueshift', 'getLiveContentByDeviceID', [slot, lcContext]);
 };
 
 /**
@@ -147,8 +147,8 @@ exports.getLiveContentByDeviceID = function (slot, lcContext, success, error) {
  * 
  * @param {Boolean} enabled When true, tracking is enabled. When false, disabled.
  */
-exports.enableTracking = function (enabled) {
-    exec(null, null, 'Blueshift', 'enableTracking', [enabled]);
+Blueshift.prototype.enableTracking = function (enabled) {
+    cordova.exec(null, null, 'Blueshift', 'enableTracking', [enabled]);
 };
 
 /**
@@ -157,8 +157,8 @@ exports.enableTracking = function (enabled) {
  * @param {Boolean} enabled When true, tracking is enabled. When false, disabled.
  * @param {Boolean} wipeData When true, events will be wiped. When false, nothing happens.
  */
-exports.enableTracking = function (enabled, wipeData) {
-    exec(null, null, 'Blueshift', 'enableTracking', [enabled, wipeData]);
+Blueshift.prototype.enableTracking = function (enabled, wipeData) {
+    cordova.exec(null, null, 'Blueshift', 'enableTracking', [enabled, wipeData]);
 };
 
 /**
@@ -166,8 +166,8 @@ exports.enableTracking = function (enabled, wipeData) {
  * 
  * @param {Boolean} enabled When true, opt-in else opt-out.
  */
-exports.enablePush = function (enabled) {
-    exec(null, null, 'Blueshift', 'enablePush', [enabled]);
+Blueshift.prototype.enablePush = function (enabled) {
+    cordova.exec(null, null, 'Blueshift', 'enablePush', [enabled]);
 };
 
 /**
@@ -175,16 +175,16 @@ exports.enablePush = function (enabled) {
  * 
  * @param {Boolean} enabled When true, opt-in else opt-out.
  */
-exports.enableInApp = function (enabled) {
-    exec(null, null, 'Blueshift', 'enableInApp', [enabled]);
+Blueshift.prototype.enableInApp = function (enabled) {
+    cordova.exec(null, null, 'Blueshift', 'enableInApp', [enabled]);
 };
 
 /**
  * Register for remote notifications using SDK. Calling this method will show push permission dialogue to the user.
  * Note - This is only applicable for the iOS devices.
  */
-exports.registerForRemoteNotification = function () {
-    exec(null, null, 'Blueshift', 'registerForRemoteNotification', []);
+Blueshift.prototype.registerForRemoteNotification = function () {
+    cordova.exec(null, null, 'Blueshift', 'registerForRemoteNotification', []);
 };
 
 /**
@@ -194,8 +194,8 @@ exports.registerForRemoteNotification = function () {
  * @param {double} latitude location latitude value.
  * @param {double} longitude location longitude value.
  */
-exports.setCurrentLocation = function (latitude, longitude) {
-    exec(null, null, 'Blueshift', 'setCurrentLocation', [latitude,longitude]);
+Blueshift.prototype.setCurrentLocation = function (latitude, longitude) {
+    cordova.exec(null, null, 'Blueshift', 'setCurrentLocation', [latitude,longitude]);
 };
 
 /**
@@ -203,8 +203,8 @@ exports.setCurrentLocation = function (latitude, longitude) {
  *
  * @param {function} success success callback.
  */
-exports.getEnableInAppStatus = function (success) {
-    exec(success, null, 'Blueshift', 'getEnableInAppStatus', []);
+Blueshift.prototype.getEnableInAppStatus = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getEnableInAppStatus', []);
 };
 
 /**
@@ -212,8 +212,8 @@ exports.getEnableInAppStatus = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getEnablePushStatus = function (success) {
-    exec(success, null, 'Blueshift', 'getEnablePushStatus', []);
+Blueshift.prototype.getEnablePushStatus = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getEnablePushStatus', []);
 };
 
 /**
@@ -221,8 +221,8 @@ exports.getEnablePushStatus = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getEnableTrackingStatus = function (success) {
-    exec(success, null, 'Blueshift', 'getEnableTrackingStatus', []);
+Blueshift.prototype.getEnableTrackingStatus = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getEnableTrackingStatus', []);
 };
 
 /**
@@ -230,8 +230,8 @@ exports.getEnableTrackingStatus = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoEmailID = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoEmailID', []);
+Blueshift.prototype.getUserInfoEmailID = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getUserInfoEmailID', []);
 };
 
 /**
@@ -239,8 +239,8 @@ exports.getUserInfoEmailID = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoCustomerID = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoCustomerID', []);
+Blueshift.prototype.getUserInfoCustomerID = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getUserInfoCustomerID', []);
 };
 
 /**
@@ -248,8 +248,8 @@ exports.getUserInfoCustomerID = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoFirstName = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoFirstName', []);
+Blueshift.prototype.getUserInfoFirstName = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getUserInfoFirstName', []);
 };
 
 /**
@@ -257,8 +257,8 @@ exports.getUserInfoFirstName = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoLastName = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoLastName', []);
+Blueshift.prototype.getUserInfoLastName = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getUserInfoLastName', []);
 };
 
 /**
@@ -266,8 +266,8 @@ exports.getUserInfoLastName = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getUserInfoExtras = function (success) {
-    exec(success, null, 'Blueshift', 'getUserInfoExtras', []);
+Blueshift.prototype.getUserInfoExtras = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getUserInfoExtras', []);
 };
 
 /**
@@ -275,7 +275,8 @@ exports.getUserInfoExtras = function (success) {
  *
  * @param {function} success success callback.
  */
-exports.getCurrentDeviceId = function (success) {
-    exec(success, null, 'Blueshift', 'getCurrentDeviceId', []);
+Blueshift.prototype.getCurrentDeviceId = function (success) {
+    cordova.exec(success, null, 'Blueshift', 'getCurrentDeviceId', []);
 };
 
+module.exports = new Blueshift();
