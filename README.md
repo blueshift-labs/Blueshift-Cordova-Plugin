@@ -23,14 +23,14 @@ Integrate firebase to the host app if the app does not have it integrated alread
 If the host app already has a FirebaseMessagingService implementation, please refer to [this](https://developer.blueshift.com/docs/push-notifications-android-sdk) documentation to see how you can override the BlueshiftMessagingService.
 
 ### iOS
-To support rich push notifications from Blueshift, set up notification service and content extensions as mentioned in this document. 
+To support rich push notifications from Blueshift, set up notification service and content extensions as mentioned in [this](https://developer.blueshift.com/docs/integrate-your-ios-apps-notifications-with-blueshift) document. 
 
 ## Configure the plugin (optional)
 This is an optional step if you only need event reporting and push messaging as a service from Blueshift.
 
-Once the plugin is added to the project, Blueshift SDK will be able to initialize automatically with a default set of configurations. If you wish to change these configurations, make use of the preference tag in the config.xml file.
+Once the plugin is added to the project, Blueshift SDK will be able to initialize automatically with a default set of configurations. If you wish to change these configurations, make use of the preference tag in the `config.xml` file.
 
-Below are the complete set of configurations you can specify using the config.xml file with their sample values.
+Below are the complete set of configurations you can specify using the `config.xml` file with their sample values.
 
 ### Android
 ```xml
