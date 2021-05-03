@@ -38,8 +38,6 @@
 
 #import <Cordova/CDV.h>
 #import "BlueshiftPlugin.h"
-#import "AppDelegate.h"
-#import <UserNotifications/UNUserNotificationCenter.h>
 
 @implementation BlueshiftPlugin {
     BOOL isPageLoaded;
