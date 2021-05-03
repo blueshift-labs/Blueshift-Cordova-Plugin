@@ -792,7 +792,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         cordova.getThreadPool().submit(() -> {
             UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
             if (userInfo != null) {
-                userInfo.clear(cordova.getContext())
+                userInfo.clear(cordova.getContext());
                 userInfo.save(cordova.getContext());
             }
         });
