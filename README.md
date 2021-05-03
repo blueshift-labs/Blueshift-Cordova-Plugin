@@ -389,3 +389,28 @@ Blueshift.registerForRemoteNotification();
 Blueshift.setCurrentLocation(latitude, longitude);
 
 ```
+
+### Deep link callbacks - 
+Set up event listeners to listen to the deep link events triggered by Blueshift plugin. Once deep link is received, you can perform some business logic to navigate to desired screen.
+
+-- `OnBlueshiftDeepLinkReplayStart` - Universal links are shortened links and requires replaying in order to get the original URL. This event will be fired when the replaying of the URL beigns. (Applicable to only universal links)
+- `OnBlueshiftDeepLinkReplaySuccess` - Push, in-app and universal link deep links will be triggered under this event name.
+- `OnBlueshiftDeepLinkReplayFail` - This event will be fired when the URL replay fails due to some error. (Applicable to only universal links)
+
+```JS
+document.addEventListener('OnBlueshiftDeepLinkReplayStart', function(e) {
+    showLoader();
+});
+
+document.addEventListener('OnBlueshiftDeepLinkSuccess',  function(e){
+    hideLoader();
+    alert("Deep link - "+e.deepLink);
+  });
+  
+document.addEventListener('OnBlueshiftDeepLinkReplayFail',  function(e){
+    hideLoader();
+    alert("Deep link - "+e.deepLink);
+  });
+
+```
+
