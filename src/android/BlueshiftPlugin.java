@@ -605,9 +605,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean getEnableInAppStatus(CallbackContext callbackContext) {
-        Log.d(TAG, "getEnableInAppStatus: ");
+        if (callbackContext != null) {
+            boolean isEnabled = BlueshiftAppPreferences.getInstance(mAppContext).getEnableInApp();
+            callbackContext.success(isEnabled ? 1 : 0);
 
-        // Todo: implement the code.
+            Log.d(TAG, "getEnableInAppStatus: " + isEnabled);
+        }
+
         return true;
     }
 
@@ -646,10 +650,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean registerForInAppMessages(JSONArray args) throws JSONException {
         String screenName = args.getString(0);
-        // blueshift.registerForInAppMessages(cordova.getActivity(), screenName);
+        mBlueshift.registerForInAppMessages(cordova.getActivity(), screenName);
         Log.d(TAG, "registerForInAppMessages: { \"screenName\" : \"" + screenName + "\"}");
-
-        mBlueshift.registerForInAppMessages(cordova.getActivity());
 
         return true;
     }
@@ -790,7 +792,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         cordova.getThreadPool().submit(() -> {
             UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
             if (userInfo != null) {
-                // TODO clear user info
+                userInfo.clear(cordova.getContext())
                 userInfo.save(cordova.getContext());
             }
         });
@@ -859,7 +861,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean enableInApp(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
         Log.d(TAG, "enableInApp: {\"enabled\":" + isEnabled + "}");
-        // TODO implement this
+        BlueshiftAppPreferences.getInstance(cordova.getContext()).setEnableInApp(isEnabled);
+        BlueshiftAppPreferences.getInstance(cordova.getContext()).save(cordova.getContext());
 
         return true;
     }
