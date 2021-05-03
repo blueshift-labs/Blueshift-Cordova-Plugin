@@ -5,32 +5,46 @@
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
 
-#define BLUESHIFT_PREF_API_KEY @"com.blueshift.config.event_api_key"
-#define BLUESHIFT_PREF_PUSH_ENABLED @"com.blueshift.config.push_enabled"
-#define BLUESHIFT_PREF_IN_APP_ENABLED @"com.blueshift.config.in_app_enabled"
-#define BLUESHIFT_PREF_IN_APP_INTERVAL @"com.blueshift.config.in_app_interval_seconds"
+#define BLUESHIFT_PREF_API_KEY                  @"com.blueshift.config.event_api_key"
+#define BLUESHIFT_PREF_PUSH_ENABLED             @"com.blueshift.config.push_enabled"
+#define BLUESHIFT_PREF_IN_APP_ENABLED           @"com.blueshift.config.in_app_enabled"
+#define BLUESHIFT_PREF_IN_APP_INTERVAL          @"com.blueshift.config.in_app_interval_seconds"
 #define BLUESHIFT_PREF_IN_APP_BACKGROUND_FETCH_ENABLED @"com.blueshift.config.in_app_background_fetch_enabled"
 #define BLUESHIFT_PREF_IN_APP_MANUAL_MODE_ENABLED @"com.blueshift.config.in_app_manual_mode_enabled"
-#define BLUESHIFT_PREF_DEVICE_ID_SOURCE @"com.blueshift.config.device_id_source"
-#define BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE @"com.blueshift.config.device_id_custom_value"
-#define BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS @"com.blueshift.config.batch_interval_seconds"
-#define BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED @"com.blueshift.config.auto_app_open_enabled"
+#define BLUESHIFT_PREF_DEVICE_ID_SOURCE         @"com.blueshift.config.device_id_source"
+#define BLUESHIFT_PREF_DEVICE_ID_CUSTOM_VALUE   @"com.blueshift.config.device_id_custom_value"
+#define BLUESHIFT_PREF_BATCH_INTERVAL_SECONDS   @"com.blueshift.config.batch_interval_seconds"
+#define BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED    @"com.blueshift.config.auto_app_open_enabled"
 #define BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS @"com.blueshift.config.auto_app_open_interval_seconds"
 
-#define BLUESHIFT_PREF_DEBUG_ENABLED @"com.blueshift.config.debug_enabled"
-#define BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED @"com.blueshift.config.scene_delegate_enabled"
-#define BLUESHIFT_PREF_APP_GROUP_ID @"com.blueshift.config.app_group_id"
-#define BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED @"com.blueshift.config.idfa_collection_enabled"
-#define BLUESHIFT_PREF_SILENT_PUSH_ENABLED @"com.blueshift.config.silent_push_enabled"
+#define BLUESHIFT_PREF_DEBUG_ENABLED            @"com.blueshift.config.debug_enabled"
+#define BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED   @"com.blueshift.config.scene_delegate_enabled"
+#define BLUESHIFT_PREF_APP_GROUP_ID             @"com.blueshift.config.app_group_id"
+#define BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED  @"com.blueshift.config.idfa_collection_enabled"
+#define BLUESHIFT_PREF_SILENT_PUSH_ENABLED      @"com.blueshift.config.silent_push_enabled"
 
-#define BLUESHIFT_SERIAL_QUEUE "com.blueshift.sdk"
+#define BLUESHIFT_SERIAL_QUEUE                  "com.blueshift.sdk"
+
+#define BLUESHIFT_DEEPLINK_REPLAY_START         @"OnBlueshiftDeepLinkReplayStart"
+#define BLUESHIFT_DEEPLINK_REPLAY_FAIL          @"OnBlueshiftDeepLinkReplayFail"
+#define BLUESHIFT_DEEPLINK_REPLAY_SUCCESS       @"OnBlueshiftDeepLinkReplaySuccess"
+#define BLUESHIFT_DEEPLINK_ATTRIBUTE            @"deepLink"
+#define BLUESHIFT_ERROR_ATTRIBUTE               @"error"
+
+#define BLUESHIFT_DEVICEID_SOURCE_IDFV          @"BlueshiftDeviceIdSourceIDFV"
+#define BLUESHIFT_DEVICEID_SOURCE_UUID          @"BlueshiftDeviceIdSourceUUID"
+#define BLUESHIFT_DEVICEID_SOURCE_IDFVBUNDLEID  @"BlueshiftDeviceIdSourceIDFVBundleID"
+#define BLUESHIFT_DEVICEID_SOURCE_CUSTOM        @"BlueshiftDeviceIdSourceCustom"
 
 #import <Cordova/CDV.h>
 #import "BlueshiftPlugin.h"
-#import "AppDelegate.h"
-#import <UserNotifications/UNUserNotificationCenter.h>
 
-@implementation BlueshiftPlugin
+@implementation BlueshiftPlugin {
+    BOOL isPageLoaded;
+}
+
+static NSDictionary* launchOptions = nil;
+static NSString* universalLinkAdditionalInfo = nil;
 
 static dispatch_queue_t bsft_serial_queue() {
     static dispatch_queue_t bsft_serial_queue;
@@ -42,8 +56,20 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 #pragma mark: Plugin initialisation
+
++ (void)load {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
+}
+
 - (void)pluginInitialize {
+    [self setObservers];
     [self initialiseBlueshiftSDK];
+}
+
+- (void)setObservers {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDeepLinkURLNotification:) name:BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceReady) name:CDVPageDidLoadNotification object:nil];
 }
 
 - (void)initialiseBlueshiftSDK {
@@ -70,6 +96,18 @@ static dispatch_queue_t bsft_serial_queue() {
     config.blueshiftUniversalLinksDelegate = self;
     
     [BlueShift initWithConfiguration:config];
+}
+
+- (void)deviceReady {
+    if (isPageLoaded == NO) {
+        isPageLoaded = YES;
+        if (launchOptions != nil && [BlueShift sharedInstance].appDelegate != nil) {
+            [[BlueShift sharedInstance].appDelegate handleRemoteNotificationOnLaunchWithLaunchOptions:launchOptions];
+        }
+        if (universalLinkAdditionalInfo) {
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_SUCCESS additionalInfo:universalLinkAdditionalInfo];
+        }
+    }
 }
 
 - (void)setAPIKeyForConfig:(BlueShiftConfig*)config {
@@ -140,8 +178,16 @@ static dispatch_queue_t bsft_serial_queue() {
 
 - (void)setDeviceIdSourceForConfig:(BlueShiftConfig*)config {
     if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] != nil) {
-        int deviceIdSource = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE] intValue];
-        config.blueshiftDeviceIdSource = (BlueshiftDeviceIdSource)deviceIdSource;
+        NSString* deviceIdSource = [self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_DEVICE_ID_SOURCE];
+        if ([deviceIdSource isEqualToString: BLUESHIFT_DEVICEID_SOURCE_IDFV]) {
+            config.blueshiftDeviceIdSource = BlueshiftDeviceIdSourceIDFV;
+        } else if ([deviceIdSource isEqualToString: BLUESHIFT_DEVICEID_SOURCE_UUID]){
+            config.blueshiftDeviceIdSource = BlueshiftDeviceIdSourceUUID;
+        } else if([deviceIdSource isEqualToString: BLUESHIFT_DEVICEID_SOURCE_IDFVBUNDLEID]) {
+            config.blueshiftDeviceIdSource = BlueshiftDeviceIdSourceIDFVBundleID;
+        } else if([deviceIdSource isEqualToString:BLUESHIFT_DEVICEID_SOURCE_CUSTOM]) {
+            config.blueshiftDeviceIdSource = BlueshiftDeviceIdSourceCustom;
+        }
         if (config.blueshiftDeviceIdSource == BlueshiftDeviceIdSourceCustom) {
             [self setCustomDeviceForConfig:config];
         }
@@ -195,6 +241,34 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
+#pragma mark: Deep link events handling
+- (void)handleDeepLinkURLNotification:(NSNotification *)notification {
+    if ([notification.object isKindOfClass:[NSURL class]]) {
+        NSURL *url = (NSURL*)notification.object;
+        if (url) {
+            NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString];
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_SUCCESS additionalInfo: additionalInfo];
+        }
+    }
+}
+
+- (void)fireDocumentEventForName:(NSString*) eventName additionalInfo:(NSString*)additionalInfo {
+    if (eventName && additionalInfo) {
+        NSString *js = [NSString stringWithFormat:@"cordova.fireDocumentEvent('%@', %@);",eventName,additionalInfo];
+        [self.commandDelegate evalJs:js];
+    }
+}
+
+#pragma mark: Push notification handling
++ (void)didFinishLaunchingNotification:(NSNotification *)notification {
+    if (!notification) return;
+    NSDictionary *userInfo = notification.userInfo;
+    if(!userInfo) return;
+    if(userInfo[UIApplicationLaunchOptionsRemoteNotificationKey] && [BlueShift sharedInstance].appDelegate != nil) {
+        launchOptions = userInfo;
+    }
+}
+
 #pragma mark: In app messages
 - (void)registerForInAppMessages:(CDVInvokedUrlCommand*)command
 {
@@ -226,13 +300,18 @@ static dispatch_queue_t bsft_serial_queue() {
 
 - (void)fetchInAppMessages:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
-        [[BlueShift sharedInstance] fetchInAppNotificationFromAPI:^{
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully fetched in-app notifications."];
+        if ([[BlueShiftAppData currentAppData] getCurrentInAppNotificationStatus] == YES) {
+            [[BlueShift sharedInstance] fetchInAppNotificationFromAPI:^{
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully fetched in-app notifications."];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            } failure:^(NSError * _Nonnull error) {
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch in-app notifications."];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }];
+        } else {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"In-app notifications are not currently enabled on the device."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        } failure:^(NSError * _Nonnull error) {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to fetch in-app notifications."];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        }];
+        }
     }];
 }
 
@@ -547,6 +626,18 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
+- (void)setIDFA:(CDVInvokedUrlCommand*)command {
+    if (command.arguments.count > 0) {
+        NSString* idfa = (NSString*)[command.arguments objectAtIndex:0];
+        [BlueShiftDeviceData currentDeviceData].deviceIDFA = idfa;
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully set the IDFA."];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Insufficient arguments. Failed to set IDFA."];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
 #pragma mark: Getter methods
 
 - (void)getEnableInAppStatus:(CDVInvokedUrlCommand*)command  {
@@ -575,6 +666,9 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoEmailID:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* emailId = [BlueShiftUserInfo sharedInstance].email;
+        if (!emailId) {
+            emailId = @"";
+        }
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:emailId];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -583,22 +677,31 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoCustomerID:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* customerId = [BlueShiftUserInfo sharedInstance].retailerCustomerID;
+        if (!customerId) {
+            customerId = @"";
+        }
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:customerId];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
-- (void)getUserInfoFirstname:(CDVInvokedUrlCommand*)command  {
+- (void)getUserInfoFirstName:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* firstName = [BlueShiftUserInfo sharedInstance].firstName;
+        if (!firstName) {
+            firstName = @"";
+        }
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:firstName];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
-- (void)getUserInfoLastname:(CDVInvokedUrlCommand*)command  {
+- (void)getUserInfoLastName:(CDVInvokedUrlCommand*)command  {
     [self runOnSerialQueue:^{
         NSString* lastName = [BlueShiftUserInfo sharedInstance].lastName;
+        if (!lastName) {
+            lastName = @"";
+        }
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:lastName];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -607,6 +710,9 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)getUserInfoExtras:(CDVInvokedUrlCommand*)command {
     [self runOnSerialQueue:^{
         NSDictionary* extras = [BlueShiftUserInfo sharedInstance].extras;
+        if (!extras) {
+            extras = @{};
+        }
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:extras];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
@@ -628,17 +734,30 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 #pragma mark: Blueshift Universal links delegate methods
-- (void) didCompleteLinkProcessing: (NSURL *_Nullable)url {
-    //TODO: pass event to JS layer
+- (void)didCompleteLinkProcessing: (NSURL *_Nullable)url {
+    if (url) {
+        NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString];
+        if (isPageLoaded == YES) {
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_SUCCESS additionalInfo:additionalInfo];
+        } else {
+            universalLinkAdditionalInfo = additionalInfo;
+        }
+    }
 }
 
-- (void) didFailLinkProcessingWithError: (NSError *_Nullable)error url:(NSURL *_Nullable)url {
-    //TODO: pass event to JS layer
+- (void)didFailLinkProcessingWithError: (NSError *_Nullable)error url:(NSURL *_Nullable)url {
+    if (url) {
+        NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@','%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString, BLUESHIFT_ERROR_ATTRIBUTE, error.localizedDescription];
+        if (isPageLoaded == YES) {
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_FAIL additionalInfo:additionalInfo];
+        } else {
+            universalLinkAdditionalInfo = additionalInfo;
+        }
+    }
 }
 
-- (void) didStartLinkProcessing {
-    //TODO: pass event to JS layer
+- (void)didStartLinkProcessing {
+    [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_START additionalInfo:@"{}"];
 }
-
 
 @end

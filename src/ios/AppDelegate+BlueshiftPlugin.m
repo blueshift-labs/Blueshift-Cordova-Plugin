@@ -37,7 +37,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
 #pragma mark: Open URL delegate methods
 - (BOOL)application:(UIApplication*)application openURL:(NSURL*)url sourceApplication:(NSString*)sourceApplication annotation:(id)annotation {
-    //TODO: Pass deep link to JS layer
+    [[NSNotificationCenter defaultCenter] postNotificationName:BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION object:url userInfo:nil];
     if (!url) {
         return NO;
     }
@@ -45,7 +45,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary *)options {
-    //TODO: Pass deep link to JS layer
+    [[NSNotificationCenter defaultCenter] postNotificationName:BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION object:url userInfo:options];
     if (!url) {
         return NO;
     }
@@ -54,7 +54,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
 
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
     NSURL *url = userActivity.webpageURL;
-    if (url && [[BlueShift sharedInstance] isBlueshiftUniversalLinkURL:url]) {
+    if (url) {
         [[BlueShift sharedInstance].appDelegate handleBlueshiftUniversalLinksForURL:url];
     }
     return YES;
