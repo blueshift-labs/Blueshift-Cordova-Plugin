@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.blueshift.Blueshift;
 import com.blueshift.BlueshiftAppPreferences;
+import com.blueshift.BlueshiftLinksHandler;
+import com.blueshift.BlueshiftLinksListener;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.Configuration;
 import com.blueshift.model.UserInfo;
@@ -16,7 +18,6 @@ import com.blueshift.rich_push.RichPushConstants;
 import com.blueshift.util.DeviceUtils;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaActivity;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
@@ -61,53 +62,17 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
 
-    // todo: match this to that of iOS
-    private static final String ON_DEEP_LINK = "OnDeepLink";
+    // JS Event Names for Deeplink
+    private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
+    private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS = "OnBlueshiftDeepLinkReplaySuccess";
+    private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL = "OnBlueshiftDeepLinkReplayFail";
+
+    // JS Event Params for Deeplink
+    private static final String DEEPLINK = "deeplink";
+    private static final String ERROR = "error";
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
-
-    private String documentEventJs(String event, String json) {
-        return "javascript:cordova.fireDocumentEvent('" + event + "'," + json + ");";
-    }
-
-    private String deepLinkDocumentEventJSON(String deepLink) {
-        return "{'deeplink':'" + deepLink + "'}";
-    }
-
-    private void fireDocumentEventForDeepLink(String deeplink, CordovaWebView webView) {
-        if (webView != null) {
-            String json = deepLinkDocumentEventJSON(deeplink);
-            String jsCode = documentEventJs(ON_DEEP_LINK, json);
-            webView.getView().post(() -> webView.loadUrl(jsCode));
-        }
-    }
-
-    private void openBlueshiftPushDeepLinks(Activity activity, CordovaWebView appView) {
-        if (activity != null && activity.getIntent() != null && appView != null) {
-            Bundle bundle = activity.getIntent().getExtras();
-            if (bundle != null) {
-                String deeplink = bundle.getString(RichPushConstants.EXTRA_DEEP_LINK_URL, null);
-                if (deeplink != null) fireDocumentEventForDeepLink(deeplink, appView);
-            }
-        }
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        if (intent == null) return;
-
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            // Check for deeplink URL that came via VIEW intent.
-            Uri deeplink = intent.getData();
-            if (deeplink != null) fireDocumentEventForDeepLink(deeplink.toString(), webView);
-        } else if (intent.getExtras() != null
-                && intent.getExtras().containsKey(RichPushConstants.EXTRA_DEEP_LINK_URL)) {
-            // This is check for deeplink URL from push notifications.
-            String deeplink = intent.getStringExtra(RichPushConstants.EXTRA_DEEP_LINK_URL);
-            if (deeplink != null) fireDocumentEventForDeepLink(deeplink, webView);
-        }
-    }
 
     private int getColorResourceId(String colorName) {
         return getResourceIdFromString(colorName, "color");
@@ -118,9 +83,83 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private int getResourceIdFromString(String variableName, String resourceName) {
-        return mAppContext
-                .getResources()
-                .getIdentifier(variableName, resourceName, mAppContext.getPackageName());
+        return mAppContext.getResources().getIdentifier(
+                variableName,
+                resourceName,
+                mAppContext.getPackageName());
+    }
+
+    private String documentEventJs(String event, String json) {
+        return "javascript:cordova.fireDocumentEvent('" + event + "'," + json + ");";
+    }
+
+    private void dispatchDeepLinkReplayStartEvent(CordovaWebView webView) {
+        if (webView != null) {
+            String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_START, "{}");
+            webView.getView().post(() -> webView.loadUrl(jsCode));
+        }
+    }
+
+    private void dispatchDeepLinkReplaySuccessEvent(String deeplink, CordovaWebView webView) {
+        if (webView != null) {
+            String json = "{'" + DEEPLINK + "':'" + deeplink + "'}";
+            String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS, json);
+            webView.getView().post(() -> webView.loadUrl(jsCode));
+        }
+    }
+
+    private void dispatchDeepLinkReplayFailEvent(String deeplink, String error, CordovaWebView webView) {
+        if (webView != null) {
+            String json = "{'" + DEEPLINK + "':'" + deeplink + "', '" + ERROR + "':'" + error + "'}";
+            String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL, json);
+            webView.getView().post(() -> webView.loadUrl(jsCode));
+        }
+    }
+
+    private void handleBlueshiftPushDeepLinks(Activity activity, CordovaWebView appView) {
+        if (activity != null && activity.getIntent() != null && appView != null) {
+            Bundle bundle = activity.getIntent().getExtras();
+            if (bundle != null) {
+                String deeplink = bundle.getString(RichPushConstants.EXTRA_DEEP_LINK_URL, null);
+                if (deeplink != null) dispatchDeepLinkReplaySuccessEvent(deeplink, appView);
+            }
+        }
+    }
+
+    private void handleDeepLinks(Intent intent) {
+        if (intent != null) {
+            new BlueshiftLinksHandler(mAppContext).handleBlueshiftUniversalLinks(
+                    intent.getData(),
+                    intent.getExtras(),
+                    new BlueshiftLinksListener() {
+                        @Override
+                        public void onLinkProcessingStart() {
+                            dispatchDeepLinkReplayStartEvent(webView);
+                        }
+
+                        @Override
+                        public void onLinkProcessingComplete(Uri uri) {
+                            String link = uri != null ? uri.toString() : null;
+                            dispatchDeepLinkReplaySuccessEvent(link, webView);
+                        }
+
+                        @Override
+                        public void onLinkProcessingError(Exception e, Uri uri) {
+                            String link = uri != null ? uri.toString() : null;
+                            String error = e != null ? e.getMessage() : null;
+                            dispatchDeepLinkReplayFailEvent(link, error, webView);
+                        }
+                    });
+        }
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        if (intent == null) return;
+
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            handleDeepLinks(intent);
+        }
     }
 
     @Override
@@ -131,8 +170,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         initBlueshiftWithConfig();
 
+        Activity cdvActivity = this.cordova.getActivity();
+
         // check for the Blueshift deep links coming from push click
-        openBlueshiftPushDeepLinks(this.cordova.getActivity(), this.webView);
+        handleBlueshiftPushDeepLinks(cdvActivity, this.webView);
+
+        // check and process any deep link available inside the intent
+        handleDeepLinks(cdvActivity != null ? cdvActivity.getIntent() : null);
     }
 
     private void initBlueshiftWithConfig() {
