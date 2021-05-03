@@ -1,0 +1,28 @@
+{
+  "cordova-plugin-whitelist": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-whitelist@^1.3.4"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "@globules-io/cordova-plugin-ios-xhr": {
+    "source": {
+      "type": "registry",
+      "id": "https://github.com/globules-io/cordova-plugin-ios-xhr"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "blueshift-cordova-plugin": {
+    "source": {
+      "type": "local",
+      "path": "/Users/ketanshikhare/Documents/Cordova/CordovaSampleApp/node_modules/blueshift-cordova-plugin"
+    },
+    "is_top_level": true,
+    "variables": {
+      "BSFT_EVENT_API_KEY": "YOUR API KEY"
+    }
+  }
+}
