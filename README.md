@@ -13,14 +13,14 @@ cordova plugin add https://github.com/blueshift-labs/Blueshift-Cordova-Plugin --
 #### Add Firebase Messaging to the project
 Integrate firebase to the host app if the app does not have it integrated already. Then add the following lines to the AndroidManifest.xml file to let Blueshift handle all the push messages.
 
-```
+```xml
 <service android:name="com.blueshift.fcm.BlueshiftMessagingService">
     <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT" />
     </intent-filter>
 </service>
 ```
-If the host app already has a FirebaseMessagingService implementation, please refer to this documentation to see how you can override the BlueshiftMessagingService.
+If the host app already has a FirebaseMessagingService implementation, please refer to [this](https://developer.blueshift.com/docs/push-notifications-android-sdk) documentation to see how you can override the BlueshiftMessagingService.
 
 ### iOS
 To support rich push notifications from Blueshift, set up notification service and content extensions as mentioned in this document. 
