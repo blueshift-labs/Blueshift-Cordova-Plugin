@@ -32,8 +32,8 @@
     <preference name="com.blueshift.config.auto_app_open_enabled" value="true"/>
     <preference name="com.blueshift.config.auto_app_open_interval_seconds" value="30"/>
     <preference name="com.blueshift.config.debug_enabled" value="true"/>
-    <preference name="com.blueshift.config.scene_delegate_enabled" value="false"/>
     <preference name="com.blueshift.config.app_group_id" value="group.blueshift.reads"/>
+    <preference name="com.blueshift.config.silent_push_enabled" value="true"/>
     <preference name="allowFileAccessFromFileURLs" value="true" />
     <preference name="allowUniversalAccessFromFileURLs" value="true" />
 </widget>
