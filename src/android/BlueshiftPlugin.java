@@ -707,9 +707,18 @@ public class BlueshiftPlugin extends CordovaPlugin {
         JSONObject extras = getJSONObject(args, 0);
         boolean canBatch = args.getBoolean(1);
 
-        Log.d(TAG, "identify: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
+        HashMap<String, Object> additionalArgs = new HashMap<>();
 
-        mBlueshift.trackEvent(eventName, getMap(extras), canBatch);
+        HashMap<String, Object> extrasMap = getMap(extras);
+        if (extrasMap != null) additionalArgs.putAll(extrasMap);
+
+        UserInfo user = UserInfo.getInstance(mAppContext);
+        HashMap<String, Object> userMap = user != null ? user.toHashMap() : null;
+        if (userMap != null) additionalArgs.putAll(userMap);
+
+        Log.d(TAG, "identify: {\"event\":\"" + eventName + "\", \"extras\": " + additionalArgs + ", \"canBatch\": " + canBatch + "}");
+
+        mBlueshift.trackEvent(eventName, additionalArgs, canBatch);
 
         return true;
     }
