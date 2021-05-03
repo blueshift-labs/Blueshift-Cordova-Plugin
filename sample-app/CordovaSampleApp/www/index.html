@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+<!--        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">-->
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+    <link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.mobile-1.4.5.min.js"></script>
+    </head>
+    <body>
+        <div data-role="header">
+            <h1>Cordova App</h1>
+        </div>
+        <div class="app main-content">
+             <div style ="margin-left: 5%; margin-right: 5%; text-align: center;">
+            <div class="ui-field-contain">
+                <label>Current Device Id </label>
+                 <input type="text" name="text-0" id="text-0" value="" placeholder="Device id" readonly="true">
+            </div>
+
+            <div class="ui-field-contain">
+                <label><b>User info</b></lable>
+            </div>
+                <div class="ui-field-contain">
+                     <input type="text" name="text-1" id="text-1" value="" placeholder="Enter email id">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="saveEmail()">Save email id</button>
+                </div>
+
+                <div class="ui-field-contain">
+                     <input type="text" name="text-2" id="text-2" value="" placeholder="Enter customer id">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="saveCustomerId()">Save customer id</button>
+                </div>
+
+                <div class="ui-field-contain">
+                     <input type="text" name="text-3" id="text-3" value="" placeholder="Enter first name">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="saveFirstName()">Save first name</button>
+                </div>
+
+                <div class="ui-field-contain">
+                     <input type="text" name="text-4" id="text-4" value="" placeholder="Enter last name">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="saveLastName()">Save last name</button>
+                </div>
+                
+                <div class="ui-field-contain">
+                     <input type="text" name="text-5" id="text-5" value="" placeholder="Enter extras JSON" value='{"mobile_number":"+919999999999","profession":"software engineer"}'>
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="saveExtras()">Save extras</button>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="removeUserInfo()">Remove user info</button>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <label><b>Events</b></lable>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="fireIdentify()">Fire Identify</button>
+                </div>
+
+                <div class="ui-field-contain">
+                    <input type="text" name="text-6" id="text-6" value="" placeholder="Enter custom event name">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="fireCustomEvent()">Send custom event</button>
+                </div>
+
+                <div class="ui-field-contain">
+                    <label for="eventDropDown">Select event to fire:</label>
+                    <select name="eventDropDown" id="eventDropDown" data-mini="false">
+                        <option value="bsft_send_me_in_app">bsft_send_me_in_app</option>
+                        <option value="bsft_send_me_in_app_html">bsft_send_me_in_app_html</option>
+                        <option value="bsft_send_me_in_app_modal">bsft_send_me_in_app_modal</option>
+                        <option value="bsft_send_me_push">bsft_send_me_push</option>
+                        <option value="bsft_send_me_image_push">bsft_send_me_image_push</option>
+                        <option value="bsft_send_me_animated_carousel_push">bsft_send_me_animated_carousel_push</option>
+                        <option value="bsft_send_me_nonanimated_carousel_push">bsft_send_me_nonanimated_carousel_push</option>
+                    </select>
+                    </br>
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="fireSelectedEvent()">Send selected event</button>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <label><b>iOS Specific functions</b></lable>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="registerForPush()">Register for push notifications</button>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="setCurrentLocation()">Set location</button>
+                </div>
+
+                <div class="ui-field-contain">
+                    <label><b>Enable/Disable SDK features</b></lable>
+                </div>
+                
+                <div class="ui-field-contain">
+                    <label for="flip-checkbox-enablePush">Enable push</label>
+                    <input type="checkbox" name="flip-checkbox-enablePush" id="flip-checkbox-enablePush" onchange="enablePush()">
+                </div>
+                
+                <div class="ui-field-contain">
+                    <label for="flip-checkbox-enableInApp">Enable InApp</label>
+                    <input type="checkbox" name="flip-checkbox-enableInApp" id="flip-checkbox-enableInApp" onchange="enableInApp()">
+                </div>
+
+                
+                <div class="ui-field-contain">
+                    <label for="flip-checkbox-enableTracking">Enable tracking</label>
+                    <input type="checkbox"name="flip-checkbox-enableTracking" id="flip-checkbox-enableTracking" onchange="enableTracking()">
+                </div>
+                
+                <div class="ui-field-contain">
+                    <label><b>In App notifications</b></lable>
+                </div>
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="registerForInApp()">Register for in-app notifications</button>
+                </div>
+
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="unregisterForInApp()">Unregister for in-app notifications</button>
+                </div>
+
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all show-page-loading-msg" onclick="fetchInApp()" data-textonly="false" data-textvisible="false" data-msgtext="" data-inline="true">Fetch in-app notifications</button>
+                </div>
+
+                <div class="ui-field-contain">
+                    <button class="ui-btn ui-btn-b ui-corner-all" onclick="displayInApp()">Display in-app notifications</button>
+                </div>
+                            
+                <div class="ui-field-contain">
+                    <label><b>Live content</b></lable>
+                </div>
+                              
+                <div>
+                    <fieldset data-role="controlgroup" data-type="vertical">
+                        <legend>Select user Id for Live content:</legend>
+                        <input type="radio" name="radio-choice" id="radio-choice-1" value="emailId" checked="checked">
+                        <label for="radio-choice-1">EmailId</label>
+                        <input type="radio" name="radio-choice" id="radio-choice-2" value="deviceId">
+                        <label for="radio-choice-2">DeviceId</label>
+                        <input type="radio" name="radio-choice" id="radio-choice-3" value="customerId">
+                        <label for="radio-choice-3">CustomerId</label>
+                    </fieldset>
+                <button class="ui-btn ui-btn-b ui-corner-all show-page-loading-msg" data-position-to="window" data-rel="popup" onclick="getLiveContent()" data-transition="pop" data-textonly="false" data-textvisible="false" data-msgtext="" data-inline="true">Get live content</button>
+                    <div data-role="popup" data-theme="a" data-position-to="window" id="liveContent">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="cordova.js"></script>
+        <script src="js/index.js"></script>
+    </body>
+</html>
