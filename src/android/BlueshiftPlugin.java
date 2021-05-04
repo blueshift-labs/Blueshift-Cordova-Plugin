@@ -385,8 +385,18 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private void setDeviceIdSource(Configuration configuration) {
         if (this.preferences.contains(BLUESHIFT_PREF_DEVICE_ID_SOURCE)) {
             String deviceIdSource = this.preferences.getString(BLUESHIFT_PREF_DEVICE_ID_SOURCE, null);
-            if (deviceIdSource != null)
-                configuration.setDeviceIdSource(Blueshift.DeviceIdSource.valueOf(deviceIdSource));
+            if (deviceIdSource != null) {
+                Blueshift.DeviceIdSource source = null;
+                try {
+                    source = Blueshift.DeviceIdSource.valueOf(deviceIdSource);
+                } catch (Exception e) {
+                    log("Invalid device id source provided: " + deviceIdSource);
+                }
+
+                if (source != null) {
+                    configuration.setDeviceIdSource(source);
+                }
+            }
 
             logPreferenceValue(BLUESHIFT_PREF_DEVICE_ID_SOURCE, deviceIdSource);
         } else {
