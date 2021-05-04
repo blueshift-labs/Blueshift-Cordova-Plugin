@@ -11,6 +11,7 @@ import com.blueshift.Blueshift;
 import com.blueshift.BlueshiftAppPreferences;
 import com.blueshift.BlueshiftLinksHandler;
 import com.blueshift.BlueshiftLinksListener;
+import com.blueshift.BlueshiftLogger;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.Configuration;
 import com.blueshift.model.UserInfo;
@@ -61,6 +62,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS = "com.blueshift.config.auto_app_open_interval_seconds";
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
+    private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.logging_enabled";
 
     // JS Event Names for Deeplink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
@@ -73,6 +75,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
+    private boolean mLoggingEnabled = false;
 
     private int getColorResourceId(String colorName) {
         return getResourceIdFromString(colorName, "color");
@@ -90,6 +93,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private String documentEventJs(String event, String json) {
+        log("fireDocumentEvent: event_name: " + event + ", extra_json:" + json);
         return "javascript:cordova.fireDocumentEvent('" + event + "'," + json + ");";
     }
 
@@ -168,6 +172,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
         mBlueshift = Blueshift.getInstance(mAppContext);
 
+        setLoggingStatus();
+
         initBlueshiftWithConfig();
 
         Activity cdvActivity = this.cordova.getActivity();
@@ -208,11 +214,11 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private void logMissingPreference(String key) {
-        Log.d(TAG, "Preference missing.\t{ key: " + key + " }");
+        log("Preference missing\t{ key: " + key + " }");
     }
 
     private void logPreferenceValue(String key, Object value) {
-        Log.d(TAG, "Preference found.\t{ key: " + key + ", value: " + value + " }");
+        log("Preference available\t{ key: " + key + ", value: " + value + " }");
     }
 
     private void setApiKey(Configuration configuration) {
@@ -454,6 +460,17 @@ public class BlueshiftPlugin extends CordovaPlugin {
         }
     }
 
+    private void setLoggingStatus() {
+        if (this.preferences.contains(BLUESHIFT_PREF_LOGGING_ENABLED)) {
+            mLoggingEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_LOGGING_ENABLED, false);
+            if (mLoggingEnabled) BlueshiftLogger.setLogLevel(BlueshiftLogger.VERBOSE);
+
+            logPreferenceValue(BLUESHIFT_PREF_LOGGING_ENABLED, mLoggingEnabled);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_LOGGING_ENABLED);
+        }
+    }
+
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         if (action != null) {
@@ -529,7 +546,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
                     return getCurrentDeviceId(callbackContext);
 
                 default:
-                    Log.d(TAG, "Unknown action. " + action);
+                    log("Unknown action. " + action);
             }
         }
 
@@ -542,7 +559,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             String email = userInfo != null ? userInfo.getEmail() : "";
             callbackContext.success(email);
 
-            Log.d(TAG, "getUserInfoEmailID: " + email);
+            log("getUserInfoEmailID: " + email);
         }
 
         return true;
@@ -554,7 +571,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             String customerId = userInfo != null ? userInfo.getRetailerCustomerId() : "";
             callbackContext.success(customerId);
 
-            Log.d(TAG, "getUserInfoCustomerID: " + customerId);
+            log("getUserInfoCustomerID: " + customerId);
         }
 
         return true;
@@ -566,7 +583,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             String firstName = userInfo != null ? userInfo.getFirstname() : "";
             callbackContext.success(firstName);
 
-            Log.d(TAG, "getUserInfoFirstName: " + firstName);
+            log("getUserInfoFirstName: " + firstName);
         }
 
         return true;
@@ -578,7 +595,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             String lastName = userInfo != null ? userInfo.getLastname() : "";
             callbackContext.success(lastName);
 
-            Log.d(TAG, "getUserInfoLastName: " + lastName);
+            log("getUserInfoLastName: " + lastName);
         }
 
         return true;
@@ -593,11 +610,11 @@ public class BlueshiftPlugin extends CordovaPlugin {
                 JSONObject jsonObject = getJSONObject(extraMap);
                 callbackContext.success(jsonObject);
 
-                Log.d(TAG, "getUserInfoExtras: " + jsonObject.toString());
+                log("getUserInfoExtras: " + jsonObject.toString());
             } else {
                 callbackContext.success(new JSONObject());
 
-                Log.d(TAG, "getUserInfoExtras: {}");
+                log("getUserInfoExtras: {}");
             }
         }
 
@@ -609,7 +626,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             boolean isEnabled = BlueshiftAppPreferences.getInstance(mAppContext).getEnableInApp();
             callbackContext.success(isEnabled ? 1 : 0);
 
-            Log.d(TAG, "getEnableInAppStatus: " + isEnabled);
+            log("getEnableInAppStatus: " + isEnabled);
         }
 
         return true;
@@ -620,7 +637,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             boolean isEnabled = BlueshiftAppPreferences.getInstance(mAppContext).getEnablePush();
             callbackContext.success(isEnabled ? 1 : 0);
 
-            Log.d(TAG, "getEnablePushStatus: " + isEnabled);
+            log("getEnablePushStatus: " + isEnabled);
         }
 
         return true;
@@ -631,7 +648,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             boolean isEnabled = Blueshift.isTrackingEnabled(mAppContext);
             callbackContext.success(isEnabled ? 1 : 0);
 
-            Log.d(TAG, "getEnableTrackingStatus: " + isEnabled);
+            log("getEnableTrackingStatus: " + isEnabled);
         }
 
         return true;
@@ -642,7 +659,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
             String deviceId = DeviceUtils.getDeviceId(mAppContext);
             callbackContext.success(deviceId);
 
-            Log.d(TAG, "getCurrentDeviceId: " + deviceId);
+            log("getCurrentDeviceId: " + deviceId);
         }
 
         return true;
@@ -651,13 +668,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean registerForInAppMessages(JSONArray args) throws JSONException {
         String screenName = args.getString(0);
         mBlueshift.registerForInAppMessages(cordova.getActivity(), screenName);
-        Log.d(TAG, "registerForInAppMessages: { \"screenName\" : \"" + screenName + "\"}");
+        log("registerForInAppMessages: { \"screenName\" : \"" + screenName + "\"}");
 
         return true;
     }
 
     private boolean unregisterForInAppMessages() {
-        Log.d(TAG, "unregisterForInAppMessages: ");
+        log("unregisterForInAppMessages: ");
 
         mBlueshift.unregisterForInAppMessages(cordova.getActivity());
 
@@ -665,7 +682,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean fetchInAppMessages(CallbackContext callbackContext) {
-        Log.d(TAG, "fetchInAppMessages: ");
+        log("fetchInAppMessages: ");
 
         mBlueshift.fetchInAppMessages(new InAppApiCallback() {
             @Override
@@ -683,7 +700,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean displayInAppMessages() {
-        Log.d(TAG, "displayInAppMessages: ");
+        log("displayInAppMessages: ");
 
         mBlueshift.displayInAppMessages();
 
@@ -695,7 +712,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         JSONObject extras = getJSONObject(args, 1);
         boolean canBatch = args.getBoolean(2);
 
-        Log.d(TAG, "trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
+        log("trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
 
         mBlueshift.trackEvent(eventName, getMap(extras), canBatch);
 
@@ -716,7 +733,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         HashMap<String, Object> userMap = user != null ? user.toHashMap() : null;
         if (userMap != null) additionalArgs.putAll(userMap);
 
-        Log.d(TAG, "identify: {\"event\":\"" + eventName + "\", \"extras\": " + additionalArgs + ", \"canBatch\": " + canBatch + "}");
+        log("identify: {\"event\":\"" + eventName + "\", \"extras\": " + additionalArgs + ", \"canBatch\": " + canBatch + "}");
 
         mBlueshift.trackEvent(eventName, additionalArgs, canBatch);
 
@@ -726,7 +743,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoEmailID(JSONArray args) throws JSONException {
         String email = args.getString(0);
 
-        Log.d(TAG, "setUserInfoEmailID: " + email);
+        log("setUserInfoEmailID: " + email);
 
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
@@ -740,7 +757,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoCustomerID(JSONArray args) throws JSONException {
         String customerID = args.getString(0);
 
-        Log.d(TAG, "setUserInfoCustomerID: " + customerID);
+        log("setUserInfoCustomerID: " + customerID);
 
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
@@ -754,7 +771,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoFirstName(JSONArray args) throws JSONException {
         String firstName = args.getString(0);
 
-        Log.d(TAG, "setUserInfoFirstName: " + firstName);
+        log("setUserInfoFirstName: " + firstName);
 
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
@@ -768,7 +785,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoLastName(JSONArray args) throws JSONException {
         String lastName = args.getString(0);
 
-        Log.d(TAG, "setUserInfoLastName: " + lastName);
+        log("setUserInfoLastName: " + lastName);
 
         UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
         if (userInfo != null) {
@@ -782,7 +799,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean setUserInfoExtras(JSONArray args) {
         JSONObject extras = getJSONObject(args, 0);
 
-        Log.d(TAG, "setUserInfoExtras: " + extras);
+        log("setUserInfoExtras: " + extras);
 
         cordova.getThreadPool().submit(() -> {
             UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
@@ -796,7 +813,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     }
 
     private boolean removeUserInfo() {
-        Log.d(TAG, "removeUserInfo: ");
+        log("removeUserInfo: ");
 
         cordova.getThreadPool().submit(() -> {
             UserInfo userInfo = UserInfo.getInstance(cordova.getContext());
@@ -810,7 +827,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         String slotName = args.getString(0);
         JSONObject liveContentContext = getJSONObject(args, 1);
 
-        Log.d(TAG, "getLiveContentByEmail: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
+        log("getLiveContentByEmail: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
         mBlueshift.getLiveContentByEmail(slotName, getMap(liveContentContext), callbackContext::success);
 
@@ -821,7 +838,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         String slotName = args.getString(0);
         JSONObject liveContentContext = getJSONObject(args, 1);
 
-        Log.d(TAG, "getLiveContentByCustomerID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
+        log("getLiveContentByCustomerID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
         mBlueshift.getLiveContentByCustomerId(slotName, getMap(liveContentContext), callbackContext::success);
 
@@ -832,7 +849,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         String slotName = args.getString(0);
         JSONObject liveContentContext = getJSONObject(args, 1);
 
-        Log.d(TAG, "getLiveContentByDeviceID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
+        log("getLiveContentByDeviceID: {\"slot\":\"" + slotName + "\", \"live_context\":" + liveContentContext + "}");
 
         mBlueshift.getLiveContentByDeviceId(slotName, getMap(liveContentContext), callbackContext::success);
 
@@ -842,12 +859,12 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private boolean enableTracking(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
         if (args.length() == 1) {
-            Log.d(TAG, "enableTracking: {\"enabled\":" + isEnabled + "}");
+            log("enableTracking: {\"enabled\":" + isEnabled + "}");
 
             Blueshift.setTrackingEnabled(mAppContext, isEnabled);
         } else if (args.length() == 2) {
             boolean wipeData = args.getBoolean(1);
-            Log.d(TAG, "enableTracking: {\"enabled\":" + isEnabled + ", \"wipeData\":" + wipeData + "}");
+            log("enableTracking: {\"enabled\":" + isEnabled + ", \"wipeData\":" + wipeData + "}");
 
             Blueshift.setTrackingEnabled(mAppContext, isEnabled, wipeData);
         }
@@ -857,7 +874,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean enablePush(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
-        Log.d(TAG, "enablePush: {\"enabled\":" + isEnabled + "}");
+        log("enablePush: {\"enabled\":" + isEnabled + "}");
         BlueshiftAppPreferences.getInstance(cordova.getContext()).setEnablePush(isEnabled);
         BlueshiftAppPreferences.getInstance(cordova.getContext()).save(cordova.getContext());
 
@@ -866,7 +883,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean enableInApp(JSONArray args) throws JSONException {
         boolean isEnabled = args.getBoolean(0);
-        Log.d(TAG, "enableInApp: {\"enabled\":" + isEnabled + "}");
+        log("enableInApp: {\"enabled\":" + isEnabled + "}");
         BlueshiftAppPreferences.getInstance(cordova.getContext()).setEnableInApp(isEnabled);
         BlueshiftAppPreferences.getInstance(cordova.getContext()).save(cordova.getContext());
 
@@ -919,5 +936,11 @@ public class BlueshiftPlugin extends CordovaPlugin {
         }
 
         return jsonObject;
+    }
+
+    private void log(String message) {
+        if (mLoggingEnabled && message != null) {
+            Log.d(TAG, message);
+        }
     }
 }
