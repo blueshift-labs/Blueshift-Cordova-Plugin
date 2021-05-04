@@ -64,13 +64,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
     private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.debug_logs_enabled";
 
-    // JS Event Names for Deeplink
+    // JS Event Names for DeepLink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS = "OnBlueshiftDeepLinkSuccess";
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL = "OnBlueshiftDeepLinkReplayFail";
 
-    // JS Event Params for Deeplink
-    private static final String DEEPLINK = "deeplink";
+    // JS Event Params for DeepLink
+    private static final String DEEP_LINK = "deepLink";
     private static final String ERROR = "error";
 
     private Context mAppContext = null;
@@ -106,7 +106,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private void dispatchDeepLinkReplaySuccessEvent(String deeplink, CordovaWebView webView) {
         if (webView != null) {
-            String json = "{'" + DEEPLINK + "':'" + deeplink + "'}";
+            String json = "{'" + DEEP_LINK + "':'" + deeplink + "'}";
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS, json);
             webView.getView().post(() -> webView.loadUrl(jsCode));
         }
@@ -114,20 +114,25 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private void dispatchDeepLinkReplayFailEvent(String deeplink, String error, CordovaWebView webView) {
         if (webView != null) {
-            String json = "{'" + DEEPLINK + "':'" + deeplink + "', '" + ERROR + "':'" + error + "'}";
+            String json = "{'" + DEEP_LINK + "':'" + deeplink + "', '" + ERROR + "':'" + error + "'}";
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL, json);
             webView.getView().post(() -> webView.loadUrl(jsCode));
         }
     }
 
-    private void handleBlueshiftPushDeepLinks(Activity activity, CordovaWebView appView) {
+    private boolean handleBlueshiftPushDeepLinks(Activity activity, CordovaWebView appView) {
         if (activity != null && activity.getIntent() != null && appView != null) {
             Bundle bundle = activity.getIntent().getExtras();
             if (bundle != null) {
                 String deeplink = bundle.getString(RichPushConstants.EXTRA_DEEP_LINK_URL, null);
-                if (deeplink != null) dispatchDeepLinkReplaySuccessEvent(deeplink, appView);
+                if (deeplink != null) {
+                    dispatchDeepLinkReplaySuccessEvent(deeplink, appView);
+                    return true;
+                }
             }
         }
+
+        return false;
     }
 
     private void handleDeepLinks(Intent intent) {
@@ -179,10 +184,12 @@ public class BlueshiftPlugin extends CordovaPlugin {
         Activity cdvActivity = this.cordova.getActivity();
 
         // check for the Blueshift deep links coming from push click
-        handleBlueshiftPushDeepLinks(cdvActivity, this.webView);
+        boolean isPushDLAvailable = handleBlueshiftPushDeepLinks(cdvActivity, this.webView);
 
-        // check and process any deep link available inside the intent
-        handleDeepLinks(cdvActivity != null ? cdvActivity.getIntent() : null);
+        if (!isPushDLAvailable) {
+            // check and process any deep link available inside the intent other than push deeplink
+            handleDeepLinks(cdvActivity != null ? cdvActivity.getIntent() : null);
+        }
     }
 
     private void initBlueshiftWithConfig() {
@@ -313,9 +320,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (this.preferences.contains(BLUESHIFT_PREF_NOTIFICATION_COLOR)) {
             String colorName = this.preferences.getString(BLUESHIFT_PREF_NOTIFICATION_COLOR, null);
             if (colorName != null) {
-                int colorResId = getColorResourceId(colorName);
-                int colorValue = mAppContext.getResources().getColor(colorResId);
-                configuration.setNotificationColor(colorValue);
+                try {
+                    int colorResId = getColorResourceId(colorName);
+                    int colorValue = mAppContext.getResources().getColor(colorResId);
+                    configuration.setNotificationColor(colorValue);
+                } catch (Exception e) {
+                    if (e != null) log(e.getMessage());
+                }
             }
 
             logPreferenceValue(BLUESHIFT_PREF_NOTIFICATION_COLOR, colorName);
