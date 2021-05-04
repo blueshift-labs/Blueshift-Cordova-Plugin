@@ -43,7 +43,7 @@
     BOOL isPageLoaded;
 }
 
-static NSDictionary* launchOptions = nil;
+static NSString* launchPushNotificationAdditionalInfo = nil;
 static NSString* universalLinkAdditionalInfo = nil;
 
 static dispatch_queue_t bsft_serial_queue() {
@@ -56,11 +56,6 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 #pragma mark: Plugin initialisation
-
-+ (void)load {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
-}
-
 - (void)pluginInitialize {
     [self setObservers];
     [self initialiseBlueshiftSDK];
@@ -101,11 +96,13 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)deviceReady {
     if (isPageLoaded == NO) {
         isPageLoaded = YES;
-        if (launchOptions != nil && [BlueShift sharedInstance].appDelegate != nil) {
-            [[BlueShift sharedInstance].appDelegate handleRemoteNotificationOnLaunchWithLaunchOptions:launchOptions];
+        if (launchPushNotificationAdditionalInfo != nil) {
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:launchPushNotificationAdditionalInfo];
+            launchPushNotificationAdditionalInfo = nil;
         }
         if (universalLinkAdditionalInfo) {
             [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:universalLinkAdditionalInfo];
+            universalLinkAdditionalInfo = nil;
         }
     }
 }
@@ -247,7 +244,11 @@ static dispatch_queue_t bsft_serial_queue() {
         NSURL *url = (NSURL*)notification.object;
         if (url) {
             NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString];
-            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo: additionalInfo];
+            if (isPageLoaded) {
+                [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo: additionalInfo];
+            } else {
+                launchPushNotificationAdditionalInfo = additionalInfo;
+            }
         }
     }
 }
@@ -256,16 +257,6 @@ static dispatch_queue_t bsft_serial_queue() {
     if (eventName && additionalInfo) {
         NSString *js = [NSString stringWithFormat:@"cordova.fireDocumentEvent('%@', %@);",eventName,additionalInfo];
         [self.commandDelegate evalJs:js];
-    }
-}
-
-#pragma mark: Push notification handling
-+ (void)didFinishLaunchingNotification:(NSNotification *)notification {
-    if (!notification) return;
-    NSDictionary *userInfo = notification.userInfo;
-    if(!userInfo) return;
-    if(userInfo[UIApplicationLaunchOptionsRemoteNotificationKey] && [BlueShift sharedInstance].appDelegate != nil) {
-        launchOptions = userInfo;
     }
 }
 
