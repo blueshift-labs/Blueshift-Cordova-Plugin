@@ -62,7 +62,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS = "com.blueshift.config.auto_app_open_interval_seconds";
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
-    private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.logging_enabled";
+    private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.debug_logs_enabled";
 
     // JS Event Names for Deeplink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";

@@ -111,9 +111,9 @@ Default value: set by the SDK. -->
 Default value: set by the SDK. -->
 <preference name="com.blueshift.config.network_change_job_id" value="951"/>
 
-<!-- Tells the SDK to enable logs. This will print logs from the SDK and plugin.
+<!-- Tells the SDK to enable logs. Enabling this will print logs from both the SDK and plugin.
 Default value: false. -->
-<preference name="com.blueshift.config.logging_enabled" value="true"/>
+<preference name="com.blueshift.config.debug_logs_enabled" value="true"/>
 
 ```
 
