@@ -133,7 +133,7 @@ deep link tracking. -->
 
 <!-- Tells the SDK to enable/disable the SDK debug logs.
 Default value: false -->
-<preference name="com.blueshift.config.debug_enabled" value="true"/>
+<preference name="com.blueshift.config.debug_logs_enabled" value="true"/>
 
 <!-- Tells the SDK to change interval between in-app messages.
 Default value: 60 seconds (1 minute) -->
