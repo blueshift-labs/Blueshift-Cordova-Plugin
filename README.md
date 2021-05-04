@@ -20,7 +20,7 @@ Integrate firebase to the host app if the app does not have it integrated alread
     </intent-filter>
 </service>
 ```
-If the host app already has a FirebaseMessagingService implementation, please refer to [this](https://developer.blueshift.com/docs/push-notifications-android-sdk) documentation to see how you can override the BlueshiftMessagingService.
+If the host app already has a FirebaseMessagingService implementation, please refer to [this](https://developer.blueshift.com/docs/push-notifications-android-sdk#override-blueshift-android-sdks-fcm) documentation to see how you can override the BlueshiftMessagingService.
 
 ### iOS
 To support rich push notifications from Blueshift, set up notification service and content extensions as mentioned in [this](https://developer.blueshift.com/docs/integrate-your-ios-apps-notifications-with-blueshift) document. 
