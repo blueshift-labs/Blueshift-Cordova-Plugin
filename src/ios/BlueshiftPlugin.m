@@ -17,7 +17,7 @@
 #define BLUESHIFT_PREF_AUTO_APP_OPEN_ENABLED    @"com.blueshift.config.auto_app_open_enabled"
 #define BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS @"com.blueshift.config.auto_app_open_interval_seconds"
 
-#define BLUESHIFT_PREF_DEBUG_ENABLED            @"com.blueshift.config.debug_enabled"
+#define BLUESHIFT_PREF_DEBUG_ENABLED            @"com.blueshift.config.debug_logs_enabled"
 #define BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED   @"com.blueshift.config.scene_delegate_enabled"
 #define BLUESHIFT_PREF_APP_GROUP_ID             @"com.blueshift.config.app_group_id"
 #define BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED  @"com.blueshift.config.idfa_collection_enabled"
