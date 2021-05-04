@@ -4,7 +4,7 @@ document.addEventListener('OnBlueshiftDeepLinkReplayStart', function(e) {
     showLoader();
   });
 
-document.addEventListener('OnBlueshiftDeepLinkReplaySuccess',  function(e){
+document.addEventListener('OnBlueshiftDeepLinkSuccess',  function(e){
 //    alert("Deep link - "+e.deepLink);
     localStorage.setItem("deepLink", e.deepLink);
     hideLoader();

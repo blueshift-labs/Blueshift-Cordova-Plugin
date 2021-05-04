@@ -27,7 +27,7 @@
 
 #define BLUESHIFT_DEEPLINK_REPLAY_START         @"OnBlueshiftDeepLinkReplayStart"
 #define BLUESHIFT_DEEPLINK_REPLAY_FAIL          @"OnBlueshiftDeepLinkReplayFail"
-#define BLUESHIFT_DEEPLINK_REPLAY_SUCCESS       @"OnBlueshiftDeepLinkReplaySuccess"
+#define BLUESHIFT_DEEPLINK_SUCCESS              @"OnBlueshiftDeepLinkSuccess"
 #define BLUESHIFT_DEEPLINK_ATTRIBUTE            @"deepLink"
 #define BLUESHIFT_ERROR_ATTRIBUTE               @"error"
 
@@ -105,7 +105,7 @@ static dispatch_queue_t bsft_serial_queue() {
             [[BlueShift sharedInstance].appDelegate handleRemoteNotificationOnLaunchWithLaunchOptions:launchOptions];
         }
         if (universalLinkAdditionalInfo) {
-            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_SUCCESS additionalInfo:universalLinkAdditionalInfo];
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:universalLinkAdditionalInfo];
         }
     }
 }
@@ -247,7 +247,7 @@ static dispatch_queue_t bsft_serial_queue() {
         NSURL *url = (NSURL*)notification.object;
         if (url) {
             NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString];
-            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_SUCCESS additionalInfo: additionalInfo];
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo: additionalInfo];
         }
     }
 }
@@ -738,7 +738,7 @@ static dispatch_queue_t bsft_serial_queue() {
     if (url) {
         NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString];
         if (isPageLoaded == YES) {
-            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_SUCCESS additionalInfo:additionalInfo];
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:additionalInfo];
         } else {
             universalLinkAdditionalInfo = additionalInfo;
         }
