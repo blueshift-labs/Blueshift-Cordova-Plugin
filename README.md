@@ -3,7 +3,7 @@
 Cordova plugin is a package of injected code that allows the Cordova WebView to communicate with the native platform.
 
 ## Get Blueshift Cordova Plugin
-To integrate Blueshift Android SDK to a Cordova project, you should get the latest Blueshift Cordova Plugin from GitHub. For this, go to the project’s root folder and run the following command from your terminal window.
+To integrate Blueshift to a Cordova project, you should get the latest Blueshift Cordova Plugin from GitHub. For this, go to the project’s root folder and run the following command from your terminal window.
 
 ```
 cordova plugin add https://github.com/blueshift-labs/Blueshift-Cordova-Plugin --variable BSFT_EVENT_API_KEY=<event-api-key>
