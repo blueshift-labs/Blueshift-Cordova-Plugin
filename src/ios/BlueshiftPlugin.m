@@ -273,7 +273,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)registerForInAppMessages:(CDVInvokedUrlCommand*)command
 {
     if (command.arguments.count > 0) {
-        [self runOnSerialQueue:^{
+        [self runOnSerialQueueAfter:500 block:^{
             NSString* screenName = (NSString*)[command.arguments objectAtIndex:0];
             CDVPluginResult* pluginResult = nil;
             if (screenName && screenName.length > 0) {
@@ -729,6 +729,12 @@ static dispatch_queue_t bsft_serial_queue() {
 #pragma mark: Serial queue
 - (void)runOnSerialQueue:(void (^)(void))block {
     dispatch_async(bsft_serial_queue(), ^{
+        block();
+    });
+}
+
+- (void)runOnSerialQueueAfter:(NSTimeInterval)milliSeconds block:(void (^)(void))block {
+     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, miliSeconds * NSEC_PER_MSEC),bsft_serial_queue(), ^{
         block();
     });
 }
