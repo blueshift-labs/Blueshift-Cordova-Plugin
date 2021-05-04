@@ -125,7 +125,7 @@ Default value: false -->
 
 <!-- Set app group id to the SDK. It will be used for carousel push notification
 deep link tracking. -->
-<preference name="com.blueshift.config.debug_enabled" value="true"/>
+<preference name="com.blueshift.config.app_group_id" value="group.blueshift.reads"/>
 
 <!-- Tells the SDK to enable/disable the SDK debug logs.
 Default value: false -->
