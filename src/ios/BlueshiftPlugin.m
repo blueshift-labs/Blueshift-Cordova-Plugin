@@ -91,7 +91,7 @@ static dispatch_queue_t bsft_serial_queue() {
     
     [self setBatchUploadIntervalForConfig:config];
     [self setDeviceIdSourceForConfig:config];
-    [self setAppOpenIntervalForConfig:config];
+    [self setAppOpenTrackingEnabledForConfig:config];
     
     config.blueshiftUniversalLinksDelegate = self;
     
