@@ -64,13 +64,13 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
     private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.debug_logs_enabled";
 
-    // JS Event Names for Deeplink
+    // JS Event Names for DeepLink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS = "OnBlueshiftDeepLinkSuccess";
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL = "OnBlueshiftDeepLinkReplayFail";
 
-    // JS Event Params for Deeplink
-    private static final String DEEPLINK = "deeplink";
+    // JS Event Params for DeepLink
+    private static final String DEEP_LINK = "deepLink";
     private static final String ERROR = "error";
 
     private Context mAppContext = null;
@@ -106,7 +106,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private void dispatchDeepLinkReplaySuccessEvent(String deeplink, CordovaWebView webView) {
         if (webView != null) {
-            String json = "{'" + DEEPLINK + "':'" + deeplink + "'}";
+            String json = "{'" + DEEP_LINK + "':'" + deeplink + "'}";
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS, json);
             webView.getView().post(() -> webView.loadUrl(jsCode));
         }
@@ -114,7 +114,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private void dispatchDeepLinkReplayFailEvent(String deeplink, String error, CordovaWebView webView) {
         if (webView != null) {
-            String json = "{'" + DEEPLINK + "':'" + deeplink + "', '" + ERROR + "':'" + error + "'}";
+            String json = "{'" + DEEP_LINK + "':'" + deeplink + "', '" + ERROR + "':'" + error + "'}";
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL, json);
             webView.getView().post(() -> webView.loadUrl(jsCode));
         }
