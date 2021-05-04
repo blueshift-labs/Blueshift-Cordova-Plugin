@@ -26,9 +26,9 @@ If the host app already has a FirebaseMessagingService implementation, please re
 To support rich push notifications from Blueshift, set up notification service and content extensions as mentioned in [this](https://developer.blueshift.com/docs/integrate-your-ios-apps-notifications-with-blueshift) document. 
 
 ## Configure the plugin (optional)
-This is an optional step if you only need event reporting and push messaging as a service from Blueshift.
+Configuring the plugin is optional. The plugin comes with a set of default configurations that gives you services like event reporting and push notification out of the box. But, if you wish to enable services like in-app notifications or customise any other configurations (ex: in-app interval, batch-interval, device-id source etc), you would need to configure them as mentioned below.
 
-Once the plugin is added to the project, Blueshift SDK will be able to initialize automatically with a default set of configurations. If you wish to change these configurations, make use of the preference tag in the `config.xml` file.
+To make changes to the default configurations, make use of the `<preference>` tag in the `config.xml` file.
 
 Below are the complete set of configurations you can specify using the `config.xml` file with their sample values.
 
@@ -165,7 +165,7 @@ Default value: true. -->
 <preference name="com.blueshift.config.silent_push_enabled" value="false"/>
 ```
 
-## Calling the plugin’s Js method
+## The plugin’s JS APIs
 Once you integrate the plugin successfully, you can start calling the method provided in the Js module. Below are the set of methods provided out of the box in the plugin.
 
 ```JS
