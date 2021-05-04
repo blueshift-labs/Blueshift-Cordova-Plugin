@@ -43,7 +43,7 @@
     BOOL isPageLoaded;
 }
 
-static NSDictionary* launchOptions = nil;
+static NSString* launchPushNotificationAdditionalInfo = nil;
 static NSString* universalLinkAdditionalInfo = nil;
 
 static dispatch_queue_t bsft_serial_queue() {
@@ -56,11 +56,6 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 #pragma mark: Plugin initialisation
-
-+ (void)load {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
-}
-
 - (void)pluginInitialize {
     [self setObservers];
     [self initialiseBlueshiftSDK];
@@ -91,7 +86,7 @@ static dispatch_queue_t bsft_serial_queue() {
     
     [self setBatchUploadIntervalForConfig:config];
     [self setDeviceIdSourceForConfig:config];
-    [self setAppOpenIntervalForConfig:config];
+    [self setAppOpenTrackingEnabledForConfig:config];
     
     config.blueshiftUniversalLinksDelegate = self;
     
@@ -101,11 +96,13 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)deviceReady {
     if (isPageLoaded == NO) {
         isPageLoaded = YES;
-        if (launchOptions != nil && [BlueShift sharedInstance].appDelegate != nil) {
-            [[BlueShift sharedInstance].appDelegate handleRemoteNotificationOnLaunchWithLaunchOptions:launchOptions];
+        if (launchPushNotificationAdditionalInfo != nil) {
+            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:launchPushNotificationAdditionalInfo];
+            launchPushNotificationAdditionalInfo = nil;
         }
         if (universalLinkAdditionalInfo) {
             [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:universalLinkAdditionalInfo];
+            universalLinkAdditionalInfo = nil;
         }
     }
 }
@@ -247,7 +244,11 @@ static dispatch_queue_t bsft_serial_queue() {
         NSURL *url = (NSURL*)notification.object;
         if (url) {
             NSString *additionalInfo = [NSString stringWithFormat:@"{'%@':'%@'}",BLUESHIFT_DEEPLINK_ATTRIBUTE, url.absoluteString];
-            [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo: additionalInfo];
+            if (isPageLoaded) {
+                [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo: additionalInfo];
+            } else {
+                launchPushNotificationAdditionalInfo = additionalInfo;
+            }
         }
     }
 }
@@ -259,21 +260,11 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
-#pragma mark: Push notification handling
-+ (void)didFinishLaunchingNotification:(NSNotification *)notification {
-    if (!notification) return;
-    NSDictionary *userInfo = notification.userInfo;
-    if(!userInfo) return;
-    if(userInfo[UIApplicationLaunchOptionsRemoteNotificationKey] && [BlueShift sharedInstance].appDelegate != nil) {
-        launchOptions = userInfo;
-    }
-}
-
 #pragma mark: In app messages
 - (void)registerForInAppMessages:(CDVInvokedUrlCommand*)command
 {
     if (command.arguments.count > 0) {
-        [self runOnSerialQueue:^{
+        [self runOnSerialQueueAfter:500 block:^{
             NSString* screenName = (NSString*)[command.arguments objectAtIndex:0];
             CDVPluginResult* pluginResult = nil;
             if (screenName && screenName.length > 0) {
@@ -729,6 +720,12 @@ static dispatch_queue_t bsft_serial_queue() {
 #pragma mark: Serial queue
 - (void)runOnSerialQueue:(void (^)(void))block {
     dispatch_async(bsft_serial_queue(), ^{
+        block();
+    });
+}
+
+- (void)runOnSerialQueueAfter:(NSTimeInterval)milliSeconds block:(void (^)(void))block {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, milliSeconds * NSEC_PER_MSEC),bsft_serial_queue(), ^{
         block();
     });
 }
