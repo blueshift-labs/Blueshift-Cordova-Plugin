@@ -734,7 +734,7 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 - (void)runOnSerialQueueAfter:(NSTimeInterval)milliSeconds block:(void (^)(void))block {
-     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, miliSeconds * NSEC_PER_MSEC),bsft_serial_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, milliSeconds * NSEC_PER_MSEC),bsft_serial_queue(), ^{
         block();
     });
 }
