@@ -57,9 +57,11 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 #pragma mark: Plugin initialisation
+
 - (void)pluginInitialize {
     [self setObservers];
     [self initialiseBlueshiftSDK];
+    [AppDelegate swizzleHostAppDelegate];
 }
 
 - (void)setObservers {
@@ -88,11 +90,11 @@ static dispatch_queue_t bsft_serial_queue() {
     [self setBatchUploadIntervalForConfig:config];
     [self setDeviceIdSourceForConfig:config];
     [self setAppOpenTrackingEnabledForConfig:config];
-    
+    [self setUserNotificationCenterDelegate:config];
+
     config.blueshiftUniversalLinksDelegate = self;
     
     [BlueShift initWithConfiguration:config];
-    [AppDelegate swizzleHostAppDelegate];
 }
 
 - (void)deviceReady {
@@ -243,8 +245,8 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)setUserNotificationCenterDelegate:(BlueShiftConfig*)config {
     if (@available(iOS 10.0, *)) {
         id uiApplicationDelegate = [UIApplication sharedApplication].delegate;
-        if ([uiApplicationDelegate respondsToSelector:@selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)] &&  [UNUserNotificationCenter currentNotificationCenter].delegate != nil) {
-            config.userNotificationDelegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
+        if ([uiApplicationDelegate respondsToSelector:@selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)]) {
+                config.userNotificationDelegate = uiApplicationDelegate;
         }
     }
 }
