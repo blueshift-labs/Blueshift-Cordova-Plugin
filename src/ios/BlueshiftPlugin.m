@@ -38,6 +38,7 @@
 
 #import <Cordova/CDV.h>
 #import "BlueshiftPlugin.h"
+#import "AppDelegate+BlueshiftPlugin.h"
 
 @implementation BlueshiftPlugin {
     BOOL isPageLoaded;
@@ -91,6 +92,7 @@ static dispatch_queue_t bsft_serial_queue() {
     config.blueshiftUniversalLinksDelegate = self;
     
     [BlueShift initWithConfiguration:config];
+    [AppDelegate swizzleHostAppDelegate];
 }
 
 - (void)deviceReady {
@@ -235,6 +237,15 @@ static dispatch_queue_t bsft_serial_queue() {
     if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS] != nil) {
         double appOpenInterval = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS] doubleValue];
         config.automaticAppOpenTimeInterval = appOpenInterval;
+    }
+}
+
+- (void)setUserNotificationCenterDelegate:(BlueShiftConfig*)config {
+    if (@available(iOS 10.0, *)) {
+        id uiApplicationDelegate = [UIApplication sharedApplication].delegate;
+        if ([uiApplicationDelegate respondsToSelector:@selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:)] &&  [UNUserNotificationCenter currentNotificationCenter].delegate != nil) {
+            config.userNotificationDelegate = [UNUserNotificationCenter currentNotificationCenter].delegate;
+        }
     }
 }
 

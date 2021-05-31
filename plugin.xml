@@ -33,14 +33,6 @@
                 <string>fetch</string>
             </array>
         </config-file>
-
-        
-        <framework src="BlueShift-iOS-SDK" type="podspec" spec=" 2.1.17" />
-
-        <header-file src="src/ios/BlueshiftPlugin.h" />
-        <source-file src="src/ios/BlueshiftPlugin.m" />
-        <header-file src="src/ios/AppDelegate+BlueshiftPlugin.h" />
-        <source-file src="src/ios/AppDelegate+BlueshiftPlugin.m" />
         
         <podspec>
           <config>
@@ -51,6 +43,11 @@
           </pods>
         </podspec>
         
+        <header-file src="src/ios/BlueshiftPlugin.h" />
+        <source-file src="src/ios/BlueshiftPlugin.m" />
+        <header-file src="src/ios/AppDelegate+BlueshiftPlugin.h" />
+        <source-file src="src/ios/AppDelegate+BlueshiftPlugin.m" />
+
     </platform>
     
     <platform name="android">
