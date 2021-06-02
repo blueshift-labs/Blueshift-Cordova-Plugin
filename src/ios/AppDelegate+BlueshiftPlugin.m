@@ -25,7 +25,7 @@
         if ([uiApplicationDelegate respondsToSelector:@selector(application:didRegisterForRemoteNotificationsWithDeviceToken:)]) {
             SEL originalSelector = @selector(application:didRegisterForRemoteNotificationsWithDeviceToken:);
             SEL swizzledSelector = @selector(blueshift_swizzled_application:didRegisterForRemoteNotificationsWithDeviceToken:);
-            [self swizzleMethodWithClass:class defaultSelector:originalSelector andSwizzledSelector:swizzledSelector];
+            [self swizzleMethodWithClass:class originalSelector:originalSelector andSwizzledSelector:swizzledSelector];
         } else {
             SEL originalSelector = @selector(application:didRegisterForRemoteNotificationsWithDeviceToken:);
             SEL swizzledSelector = @selector(blueshift_swizzled_no_application:didRegisterForRemoteNotificationsWithDeviceToken:);
