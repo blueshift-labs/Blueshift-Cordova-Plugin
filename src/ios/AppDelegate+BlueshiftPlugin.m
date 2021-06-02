@@ -16,7 +16,7 @@
 
 @implementation AppDelegate (BlueshiftPlugin)
 
-+ (void)swizzleHostAppDelegate {
++ (void)swizzleMainAppDelegate {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         Class class = [self class];
@@ -168,7 +168,6 @@
 }
 
 - (void)blueshift_swizzled_no_application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-    
     if([[BlueShift sharedInstance]isBlueshiftPushNotification:userInfo] == YES) {
         [[BlueShift sharedInstance].appDelegate application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
     }

@@ -10,6 +10,6 @@
 
 @interface AppDelegate (BlueshiftPlugin)
 
-+ (void)swizzleHostAppDelegate;
++ (void)swizzleMainAppDelegate;
 
 @end

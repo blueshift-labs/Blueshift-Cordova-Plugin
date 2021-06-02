@@ -61,7 +61,7 @@ static dispatch_queue_t bsft_serial_queue() {
 - (void)pluginInitialize {
     [self setObservers];
     [self initialiseBlueshiftSDK];
-    [AppDelegate swizzleHostAppDelegate];
+    [AppDelegate swizzleMainAppDelegate];
 }
 
 - (void)setObservers {
@@ -256,8 +256,8 @@ static dispatch_queue_t bsft_serial_queue() {
         id uiApplicationDelegate = [UIApplication sharedApplication].delegate;
         SEL didReceiveNotification = @selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:);
         SEL willPresentNotification = @selector(userNotificationCenter:willPresentNotification:withCompletionHandler:);
-        BOOL isUNCenerDelegate = ([uiApplicationDelegate respondsToSelector:didReceiveNotification] || [uiApplicationDelegate respondsToSelector:willPresentNotification]);
-        if (isUNCenerDelegate == YES) {
+        BOOL isUNCenterDelegate = ([uiApplicationDelegate respondsToSelector:didReceiveNotification] || [uiApplicationDelegate respondsToSelector:willPresentNotification]);
+        if (isUNCenterDelegate == YES) {
             config.userNotificationDelegate = uiApplicationDelegate;
         }
     }
