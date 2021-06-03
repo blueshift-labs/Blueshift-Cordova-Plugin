@@ -169,8 +169,28 @@ Default value: true. -->
 <preference name="com.blueshift.config.silent_push_enabled" value="false"/>
 ```
 
+#### Use Bueshift plugin with the Firebase Messaging plugin
+If you are already using the firebase Messagin plugin for iOS and you want to use the Blueshift plugin along with it, then you will need to do below changes in your iOS project.
+1. Disable Firebase method swizzling by adding key `FirebaseAppDelegateProxyEnabled` with value `NO` in the app's info.plist file. Refer to [this](https://firebase.google.com/docs/cloud-messaging/ios/client#method_swizzling_in) Firebase document for more details. 
+```xml
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+```
+2. Add below method inside the `AppDelegate.m` file of the app. After disabling the `FirebaseAppDelegateProxy` we need to manually set the device token to the Firebse SDK. You can refer to [this](https://firebase.google.com/docs/cloud-messaging/ios/client#token-swizzle-disabled) document for more details. 
+
+```objective-c
+// Import the Firebase SDK in the AppDelegate file
+#import <Firebase/Firebase.h>
+
+// Add below method inside the AppDelegate Implementation
+-(void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    [FIRMessaging messaging].APNSToken = deviceToken;
+}
+
+```
+
 ## The plugin’s JS APIs
-Once you integrate the plugin successfully, you can start calling the method provided in the Js module. Below are the set of methods provided out of the box in the plugin.
+Once you integrate the plugin successfully, you can start calling the method provided in the Js module. Below are the set of methods provided out of the box in the plugin. 
 
 ```JS
 /**
@@ -393,6 +413,7 @@ Blueshift.registerForRemoteNotification();
 Blueshift.setCurrentLocation(latitude, longitude);
 
 ```
+
 
 ### Deep link callbacks - 
 Set up event listeners to listen to the deep link events triggered by Blueshift plugin. Once deep link is received, you can perform some business logic to navigate to desired screen.
