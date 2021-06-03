@@ -170,13 +170,13 @@ Default value: true. -->
 ```
 
 #### Use Bueshift plugin with the Firebase Messaging plugin
-If you are already using the firebase Messagin plugin for iOS and you want to use the Blueshift plugin along with it, then you will need to do below changes in your iOS project.
-1. Disable Firebase method swizzling by adding key `FirebaseAppDelegateProxyEnabled` with value `NO` in the app's info.plist file. Refer to [this](https://firebase.google.com/docs/cloud-messaging/ios/client#method_swizzling_in) Firebase document for more details. 
+If you are using the Firebase Messaging plugin for iOS and you want to use the Blueshift plugin along with it, then you will need to do below changes in your iOS project.
+1. Disable Firebase method swizzling by disabling the `FirebaseAppDelegateProxy`. You can do that by adding key `FirebaseAppDelegateProxyEnabled` with value `NO` in the app's info.plist file. Refer to [this](https://firebase.google.com/docs/cloud-messaging/ios/client#method_swizzling_in) Firebase document for more details. 
 ```xml
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 ```
-2. Add below method inside the `AppDelegate.m` file of the app. After disabling the `FirebaseAppDelegateProxy` we need to manually set the device token to the Firebse SDK. You can refer to [this](https://firebase.google.com/docs/cloud-messaging/ios/client#token-swizzle-disabled) document for more details. 
+2. Add below method inside the `AppDelegate.m` file of the app. After disabling the `FirebaseAppDelegateProxy` we need to manually set the device token to the Firebase SDK. You can refer to [this](https://firebase.google.com/docs/cloud-messaging/ios/client#token-swizzle-disabled) document for more details. 
 
 ```objective-c
 // Import the Firebase SDK in the AppDelegate file
