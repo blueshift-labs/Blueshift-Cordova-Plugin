@@ -6,7 +6,10 @@
 //  Copyright Blueshift 2021. All rights reserved.
 
 #import "AppDelegate.h"
+@import UserNotifications;
 
 @interface AppDelegate (BlueshiftPlugin)
+
++ (void)swizzleMainAppDelegate;
 
 @end

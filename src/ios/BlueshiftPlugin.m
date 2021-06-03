@@ -38,6 +38,7 @@
 
 #import <Cordova/CDV.h>
 #import "BlueshiftPlugin.h"
+#import "AppDelegate+BlueshiftPlugin.h"
 
 @implementation BlueshiftPlugin {
     BOOL isPageLoaded;
@@ -56,15 +57,19 @@ static dispatch_queue_t bsft_serial_queue() {
 }
 
 #pragma mark: Plugin initialisation
+
 - (void)pluginInitialize {
     [self setObservers];
     [self initialiseBlueshiftSDK];
+    [AppDelegate swizzleMainAppDelegate];
 }
 
 - (void)setObservers {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleDeepLinkURLNotification:) name:BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceReady) name:CDVPageDidLoadNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLaunchingNotification:) name:UIApplicationDidFinishLaunchingNotification object:nil];
 }
 
 - (void)initialiseBlueshiftSDK {
@@ -87,7 +92,8 @@ static dispatch_queue_t bsft_serial_queue() {
     [self setBatchUploadIntervalForConfig:config];
     [self setDeviceIdSourceForConfig:config];
     [self setAppOpenTrackingEnabledForConfig:config];
-    
+    [self setUserNotificationCenterDelegate:config];
+
     config.blueshiftUniversalLinksDelegate = self;
     
     [BlueShift initWithConfiguration:config];
@@ -104,6 +110,13 @@ static dispatch_queue_t bsft_serial_queue() {
             [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_SUCCESS additionalInfo:universalLinkAdditionalInfo];
             universalLinkAdditionalInfo = nil;
         }
+    }
+}
+
+- (void)didFinishLaunchingNotification:(NSNotification*)notification {
+    if (!notification) return;
+    if(notification.userInfo) {
+        [[BlueShift sharedInstance].appDelegate handleRemoteNotificationOnLaunchWithLaunchOptions:notification.userInfo];
     }
 }
 
@@ -235,6 +248,18 @@ static dispatch_queue_t bsft_serial_queue() {
     if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS] != nil) {
         double appOpenInterval = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS] doubleValue];
         config.automaticAppOpenTimeInterval = appOpenInterval;
+    }
+}
+
+- (void)setUserNotificationCenterDelegate:(BlueShiftConfig*)config {
+    if (@available(iOS 10.0, *)) {
+        id uiApplicationDelegate = [UIApplication sharedApplication].delegate;
+        SEL didReceiveNotification = @selector(userNotificationCenter:didReceiveNotificationResponse:withCompletionHandler:);
+        SEL willPresentNotification = @selector(userNotificationCenter:willPresentNotification:withCompletionHandler:);
+        BOOL isUNCenterDelegate = ([uiApplicationDelegate respondsToSelector:didReceiveNotification] || [uiApplicationDelegate respondsToSelector:willPresentNotification]);
+        if (isUNCenterDelegate == YES) {
+            config.userNotificationDelegate = uiApplicationDelegate;
+        }
     }
 }
 
