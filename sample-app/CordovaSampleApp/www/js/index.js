@@ -96,8 +96,8 @@ function fireSelectedEvent(){
 function registerForPush(){
     Blueshift.registerForRemoteNotification();
 }
-function resetDeviceid() {
-    Blueshift.resetDeviceid();
+function resetDeviceId() {
+    Blueshift.resetDeviceId();
 }
 function enablePush(){
     var val = $("#flip-checkbox-enablePush").is(":checked");

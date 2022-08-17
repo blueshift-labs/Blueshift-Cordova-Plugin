@@ -111,7 +111,7 @@ Blueshift.prototype.removeUserInfo = function () {
 * This method will only work if the device id type is set as UUID for iOS and GUID for Android. 
 * It will not work for other device id types.
 */
-Blueshift.prototype.removeUserInfo = function () {
+Blueshift.prototype.resetDeviceId = function () {
     cordova.exec(null, null, 'Blueshift', 'resetDeviceId', []);
 };
 
