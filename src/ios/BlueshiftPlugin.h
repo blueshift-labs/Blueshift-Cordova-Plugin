@@ -28,6 +28,9 @@
 - (void)setUserInfoExtras:(CDVInvokedUrlCommand*)command;
 - (void)removeUserInfo:(CDVInvokedUrlCommand*)command;
 
+// Reset Device id
+- (void)resetDeviceId:(CDVInvokedUrlCommand*)command;
+
 // Manage SDK features
 - (void)enableTracking:(CDVInvokedUrlCommand*)command;
 - (void)enablePush:(CDVInvokedUrlCommand*)command;

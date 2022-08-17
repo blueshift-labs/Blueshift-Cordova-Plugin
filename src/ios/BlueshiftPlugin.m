@@ -18,10 +18,10 @@
 #define BLUESHIFT_PREF_AUTO_APP_OPEN_INTERVAL_SECONDS @"com.blueshift.config.auto_app_open_interval_seconds"
 
 #define BLUESHIFT_PREF_DEBUG_ENABLED            @"com.blueshift.config.debug_logs_enabled"
-#define BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED   @"com.blueshift.config.scene_delegate_enabled"
 #define BLUESHIFT_PREF_APP_GROUP_ID             @"com.blueshift.config.app_group_id"
-#define BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED  @"com.blueshift.config.idfa_collection_enabled"
 #define BLUESHIFT_PREF_SILENT_PUSH_ENABLED      @"com.blueshift.config.silent_push_enabled"
+#define BLUESHIFT_PREF_REGION                   @"com.blueshift.config.region"
+#define BLUESHIFT_PREF_SDK_COREDATA_FILES_LOCATION  @"com.blueshift.config.sdk_coredata_files_location"
 
 #define BLUESHIFT_SERIAL_QUEUE                  "com.blueshift.sdk"
 
@@ -35,6 +35,12 @@
 #define BLUESHIFT_DEVICEID_SOURCE_UUID          @"BlueshiftDeviceIdSourceUUID"
 #define BLUESHIFT_DEVICEID_SOURCE_IDFVBUNDLEID  @"BlueshiftDeviceIdSourceIDFVBundleID"
 #define BLUESHIFT_DEVICEID_SOURCE_CUSTOM        @"BlueshiftDeviceIdSourceCustom"
+
+#define BLUESHIFT_REGION_US                     @"US"
+#define BLUESHIFT_REGION_EU                     @"EU"
+
+#define BLUESHIFT_SDK_DOCUMENTS_DIRECTORY       @"Documents"
+#define BLUESHIFT_SDK_LIBRARY_DIRECTORY         @"Library"
 
 #import <Cordova/CDV.h>
 #import "BlueshiftPlugin.h"
@@ -78,8 +84,6 @@ static dispatch_queue_t bsft_serial_queue() {
     
     [self setAppGroupIdForConfig:config];
     [self setDebugEnabledForConfig:config];
-    [self setIDFACollectionEnabledForConfig:config];
-    [self setSceneDelegateEnabledForConfig:config];
 
     [self setPushEnabledForConfig:config];
     [self setSilentPushEnabledForConfig:config];
@@ -93,6 +97,9 @@ static dispatch_queue_t bsft_serial_queue() {
     [self setDeviceIdSourceForConfig:config];
     [self setAppOpenTrackingEnabledForConfig:config];
     [self setUserNotificationCenterDelegate:config];
+    
+    [self setSDKCoreDataFilesLocation:config];
+    [self setRegion:config];
 
     config.blueshiftUniversalLinksDelegate = self;
     
@@ -134,21 +141,6 @@ static dispatch_queue_t bsft_serial_queue() {
     }
 }
 
-- (void)setSceneDelegateEnabledForConfig:(BlueShiftConfig*)config {
-    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED] != nil) {
-        BOOL isSceneDelegateEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SCENE_DELEGATE_ENABLED] boolValue];
-        if (@available(iOS 13.0, *)) {
-            config.isSceneDelegateConfiguration = isSceneDelegateEnabled;
-        }
-    }
-}
-
-- (void)setIDFACollectionEnabledForConfig:(BlueShiftConfig*)config {
-    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED] != nil) {
-        BOOL isIDFACollectionEnabled = [[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_IDFA_COLLECTION_ENABLED] boolValue];
-        config.enableIDFACollection = isIDFACollectionEnabled;
-    }
-}
 - (void)setAppGroupIdForConfig:(BlueShiftConfig*)config {
     if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_APP_GROUP_ID] != nil) {
         NSString* appGroupID = (NSString*)[self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_APP_GROUP_ID];
@@ -259,6 +251,24 @@ static dispatch_queue_t bsft_serial_queue() {
         BOOL isUNCenterDelegate = ([uiApplicationDelegate respondsToSelector:didReceiveNotification] || [uiApplicationDelegate respondsToSelector:willPresentNotification]);
         if (isUNCenterDelegate == YES) {
             config.userNotificationDelegate = uiApplicationDelegate;
+        }
+    }
+}
+
+- (void)setRegion:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_REGION] != nil) {
+        NSString* region = [self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_REGION];
+        if ([region isEqualToString: BLUESHIFT_REGION_EU]) {
+            config.region = BlueshiftRegionEU;
+        }
+    }
+}
+
+- (void)setSDKCoreDataFilesLocation:(BlueShiftConfig*)config {
+    if ([self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SDK_COREDATA_FILES_LOCATION] != nil) {
+        NSString* directory = [self.commandDelegate.settings valueForKey:BLUESHIFT_PREF_SDK_COREDATA_FILES_LOCATION];
+        if ([directory isEqualToString: BLUESHIFT_SDK_LIBRARY_DIRECTORY]) {
+            config.sdkCoreDataFilesLocation = BlueshiftFilesLocationLibraryDirectory;
         }
     }
 }
@@ -457,7 +467,7 @@ static dispatch_queue_t bsft_serial_queue() {
         [self runOnSerialQueue:^{
             NSDictionary* extras = (NSDictionary*)[command.arguments objectAtIndex:0];
             if (extras && [extras isKindOfClass:[NSDictionary class]]) {
-                [[BlueShiftUserInfo sharedInstance] setExtras:extras];
+                [[BlueShiftUserInfo sharedInstance] setExtras:[extras mutableCopy]];
                 [[BlueShiftUserInfo sharedInstance] save];
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully set the extras for the user."];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -479,6 +489,20 @@ static dispatch_queue_t bsft_serial_queue() {
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
+
+- (void)resetDeviceId:(CDVInvokedUrlCommand*)command {
+    [self runOnSerialQueue:^{
+        CDVPluginResult* pluginResult = nil;
+        if ([BlueShift sharedInstance].config.blueshiftDeviceIdSource == BlueshiftDeviceIdSourceUUID) {
+        [[BlueShiftDeviceData currentDeviceData] resetDeviceUUID];
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully reset the device id."];
+        } else {
+            pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed reset the device id."];
+        }
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }];
+}
+
 
 #pragma mark: enable/disable SDK functinality
 - (void)enableTracking:(CDVInvokedUrlCommand*)command {
