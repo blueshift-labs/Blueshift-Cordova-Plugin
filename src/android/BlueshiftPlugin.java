@@ -562,9 +562,15 @@ public class BlueshiftPlugin extends CordovaPlugin {
                 case "getEnableTrackingStatus":
                     return getEnableTrackingStatus(callbackContext);
 
-                // OTHER GETTERS
+                // DEVICE ID
                 case "getCurrentDeviceId":
                     return getCurrentDeviceId(callbackContext);
+                case "resetDeviceId":
+                    return resetDeviceId();
+
+                // PUSH
+                case "registerForRemoteNotification":
+                    return requestPushNotificationPermission();
 
                 default:
                     log("Unknown action. " + action);
@@ -682,6 +688,14 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
             log("getCurrentDeviceId: " + deviceId);
         }
+
+        return true;
+    }
+
+    private boolean resetDeviceId() {
+        log("resetDeviceId: ");
+
+        Blueshift.resetDeviceId(mAppContext);
 
         return true;
     }
@@ -909,6 +923,10 @@ public class BlueshiftPlugin extends CordovaPlugin {
         BlueshiftAppPreferences.getInstance(cordova.getContext()).save(cordova.getContext());
 
         return true;
+    }
+
+    private boolean requestPushNotificationPermission() {
+        Blueshift.requestPushNotificationPermission(cordova.getActivity());
     }
 
     JSONObject getJSONObject(JSONArray jsonArray, int index) {
