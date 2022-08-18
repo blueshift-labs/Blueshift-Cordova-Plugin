@@ -13,6 +13,7 @@ import com.blueshift.BlueshiftConstants;
 import com.blueshift.BlueshiftLinksHandler;
 import com.blueshift.BlueshiftLinksListener;
 import com.blueshift.BlueshiftLogger;
+import com.blueshift.BlueshiftRegion;
 import com.blueshift.BuildConfig;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.Configuration;
@@ -65,6 +66,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
     private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.debug_logs_enabled";
+    private static final String BLUESHIFT_PREF_REGION = "com.blueshift.config.region";
 
     // JS Event Names for DeepLink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
@@ -201,6 +203,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         Configuration config = new Configuration();
 
         setApiKey(config);
+        setBlueshiftRegion(config);
         setAppIcon(config);
         setPushEnabled(config);
         setInAppEnabled(config);
@@ -483,6 +486,28 @@ public class BlueshiftPlugin extends CordovaPlugin {
             logPreferenceValue(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID, jobId);
         } else {
             logMissingPreference(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID);
+        }
+    }
+
+    private void setBlueshiftRegion(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_REGION)) {
+            String region = this.preferences.getString(BLUESHIFT_PREF_REGION, "US");
+            if (region != null) {
+                if (region.isEmpty()) {
+                    log("Empty region name provided. Using the default value: US.");
+                } else {
+                    try {
+                        BlueshiftRegion bsftRegion = BlueshiftRegion.valueOf(region);
+                        configuration.setRegion(bsftRegion);
+                    } catch (Exception e) {
+                        log("Invalid region name provided: " + region + ". Supported values are: US, EU.");
+                    }
+                }
+            }
+
+            logPreferenceValue(BLUESHIFT_PREF_REGION, region);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_REGION);
         }
     }
 
