@@ -27,13 +27,15 @@
     <preference name="com.blueshift.config.in_app_interval_seconds" value="30"/>
     <preference name="com.blueshift.config.in_app_background_fetch_enabled" value="true"/>
     <preference name="com.blueshift.config.in_app_manual_mode_enabled" value="false"/>
-    <preference name="com.blueshift.config.device_id_source" value="BlueshiftDeviceIdSourceIDFV"/>
+    <preference name="com.blueshift.config.device_id_source" value="BlueshiftDeviceIdSourceUUID"/>
     <preference name="com.blueshift.config.batch_interval_seconds" value="30"/>
     <preference name="com.blueshift.config.auto_app_open_enabled" value="true"/>
     <preference name="com.blueshift.config.auto_app_open_interval_seconds" value="30"/>
-    <preference name="com.blueshift.config.debug_enabled" value="true"/>
+    <preference name="com.blueshift.config.debug_logs_enabled" value="true"/>
     <preference name="com.blueshift.config.app_group_id" value="group.blueshift.reads"/>
     <preference name="com.blueshift.config.silent_push_enabled" value="true"/>
+    <preference name="com.blueshift.config.region" value="US"/>
+    <preference name="com.blueshift.config.sdk_coredata_files_location" value="Library"/>
     <preference name="allowFileAccessFromFileURLs" value="true" />
     <preference name="allowUniversalAccessFromFileURLs" value="true" />
 </widget>
