@@ -9,9 +9,11 @@ import android.util.Log;
 
 import com.blueshift.Blueshift;
 import com.blueshift.BlueshiftAppPreferences;
+import com.blueshift.BlueshiftConstants;
 import com.blueshift.BlueshiftLinksHandler;
 import com.blueshift.BlueshiftLinksListener;
 import com.blueshift.BlueshiftLogger;
+import com.blueshift.BuildConfig;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.Configuration;
 import com.blueshift.model.UserInfo;
@@ -72,6 +74,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
     // JS Event Params for DeepLink
     private static final String DEEP_LINK = "deepLink";
     private static final String ERROR = "error";
+
+    // TODO: 18/08/22 Change this on each plugin release
+    private static final String CDV_PLUGIN_VERSION = "0.0.3";
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
@@ -742,9 +747,20 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
+    private JSONObject appendVersion(JSONObject jsonObject) {
+        if (jsonObject == null) jsonObject = new JSONObject();
+        String version = BuildConfig.SDK_VERSION + "-CD-" + CDV_PLUGIN_VERSION;
+        try {
+            jsonObject.put(BlueshiftConstants.KEY_SDK_VERSION, version);
+        } catch (JSONException ignore) {
+        }
+
+        return jsonObject;
+    }
+
     private boolean trackCustomEvent(JSONArray args) throws JSONException {
         String eventName = args.getString(0);
-        JSONObject extras = getJSONObject(args, 1);
+        JSONObject extras = appendVersion(getJSONObject(args, 1));
         boolean canBatch = args.getBoolean(2);
 
         log("trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
@@ -756,7 +772,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean identify(JSONArray args) throws JSONException {
         String eventName = "identify";
-        JSONObject extras = getJSONObject(args, 0);
+        JSONObject extras = appendVersion(getJSONObject(args, 0));
         boolean canBatch = args.getBoolean(1);
 
         HashMap<String, Object> additionalArgs = new HashMap<>();
