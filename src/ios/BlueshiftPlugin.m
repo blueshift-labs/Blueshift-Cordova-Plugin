@@ -45,6 +45,7 @@
 #import <Cordova/CDV.h>
 #import "BlueshiftPlugin.h"
 #import "AppDelegate+BlueshiftPlugin.h"
+#import <BlueShift_iOS_SDK/BlueshiftVersion.h>
 
 @implementation BlueshiftPlugin {
     BOOL isPageLoaded;
@@ -364,10 +365,7 @@ static dispatch_queue_t bsft_serial_queue() {
                 isBatch = [[command.arguments objectAtIndex:2] boolValue];
             }
             if (eventName) {
-                if (eventParams && ![eventParams isKindOfClass:[NSDictionary class]]) {
-                    eventParams = nil;
-                }
-                [[BlueShift sharedInstance] trackEventForEventName:eventName andParameters:eventParams canBatchThisEvent:isBatch];
+                [[BlueShift sharedInstance] trackEventForEventName:eventName andParameters:[self addCDSDKVersionString:eventParams] canBatchThisEvent:isBatch];
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully tracked the event."];
             } else {
                 pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Missing event name. Failed to track the event."];
@@ -388,10 +386,7 @@ static dispatch_queue_t bsft_serial_queue() {
             if (command.arguments.count > 1) {
                 isBatch = [[command.arguments objectAtIndex:1] boolValue];
             }
-            if (eventParams && ![eventParams isKindOfClass:[NSDictionary class]]) {
-                eventParams = nil;
-            }
-            [[BlueShift sharedInstance] identifyUserWithDetails:eventParams canBatchThisEvent:isBatch];
+            [[BlueShift sharedInstance] identifyUserWithDetails:[self addCDSDKVersionString:eventParams] canBatchThisEvent:isBatch];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Successfully tracked the identify event."];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
         }];
@@ -804,6 +799,20 @@ static dispatch_queue_t bsft_serial_queue() {
 
 - (void)didStartLinkProcessing {
     [self fireDocumentEventForName:BLUESHIFT_DEEPLINK_REPLAY_START additionalInfo:@"{}"];
+}
+
+#pragma mark - helper methods
+- (NSDictionary *)addCDSDKVersionString: (NSDictionary*) details {
+    NSString *sdkVersion = [NSString stringWithFormat:@"%@-CD-%@",kBlueshiftSDKVersion,kBlueshiftCordovaSDKVersion];
+    if ([details isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary *dict = [details mutableCopy];
+        dict[kInAppNotificationModalSDKVersionKey] = sdkVersion;
+        return dict;
+    } else {
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        dict[kInAppNotificationModalSDKVersionKey] = sdkVersion;
+        return dict;
+    }
 }
 
 @end
