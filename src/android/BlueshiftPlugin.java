@@ -927,6 +927,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean requestPushNotificationPermission() {
         Blueshift.requestPushNotificationPermission(cordova.getActivity());
+
+        return true;
     }
 
     JSONObject getJSONObject(JSONArray jsonArray, int index) {
