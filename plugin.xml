@@ -53,10 +53,10 @@
     <platform name="android">
         <!-- CLI variables for accepting API key and optional lib versions. -->
         <preference name="BSFT_EVENT_API_KEY" />
-        <preference name="BSFT_SDK_VERSION" default="3.2.0"/>
-        <preference name="GSON_VERSION" default="2.8.6"/>
-        <preference name="FIREBASE_CORE_VERSION" default="16.0.6"/>
-        <preference name="FIREBASE_MESSAGING_VERSION" default="17.3.4"/>
+        <preference name="BSFT_SDK_VERSION" default="3.3.0"/>
+        <preference name="GSON_VERSION" default="2.8.9"/>
+        <preference name="FIREBASE_CORE_VERSION" default="17.4.4"/>
+        <preference name="FIREBASE_MESSAGING_VERSION" default="20.3.0"/>
 
         <config-file parent="/*" target="config.xml">
             <preference name="GradlePluginGoogleServicesEnabled" value="true" />
@@ -74,11 +74,12 @@
             <uses-permission android:name="android.permission.INTERNET" />
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
             <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- Optional -->
+            <uses-permission android:name="android.permission.POST_NOTIFICATIONS" /> <!-- Optional -->
         </config-file>
 
         <source-file src="src/android/BlueshiftPlugin.java" target-dir="src/com/blueshift/cordova" />
 
-        <framework src="com.blueshift:android-sdk:$BSFT_SDK_VERSION"/>
+        <framework src="com.blueshift:android-sdk-x:$BSFT_SDK_VERSION"/>
         <framework src="com.google.code.gson:gson:$GSON_VERSION"/>
         <framework src="com.google.firebase:firebase-core:$FIREBASE_CORE_VERSION"/>
         <framework src="com.google.firebase:firebase-messaging:$FIREBASE_MESSAGING_VERSION"/>

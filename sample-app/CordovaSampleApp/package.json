@@ -15,12 +15,10 @@
   "devDependencies": {
     "@globules-io/cordova-plugin-ios-xhr": "git+https://github.com/globules-io/cordova-plugin-ios-xhr.git",
     "blueshift-cordova-plugin": "file:../../Blueshift-Repository/Blueshift-Cordova-Plugin",
-    "cordova-ios": "^6.2.0",
-    "cordova-plugin-whitelist": "^1.3.4"
+    "cordova-ios": "^6.2.0"
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-whitelist": {},
       "@globules-io/cordova-plugin-ios-xhr": {},
       "blueshift-cordova-plugin": {
         "BSFT_EVENT_API_KEY": "YOUR API KEY"

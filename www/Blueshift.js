@@ -190,8 +190,9 @@ Blueshift.prototype.enableInApp = function (enabled) {
 
 /**
  * Register for remote notifications using SDK. Calling this method will show push permission dialogue to the user.
- * Note - This is only applicable for the iOS devices.
- */
+ * 
+ * Android: Requires Android 13 or above and the 'android.permission.POST_NOTIFICATIONS' permission added in the AndroidManifest.xml file.
+*/
 Blueshift.prototype.registerForRemoteNotification = function () {
     cordova.exec(null, null, 'Blueshift', 'registerForRemoteNotification', []);
 };
