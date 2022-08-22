@@ -101,26 +101,6 @@
             SEL swizzledSelector = @selector(blueshift_swizzled_no_application:continueUserActivity:restorationHandler:);
             [self swizzleMethodWithClass:class originalSelector:originalSelector andSwizzledSelector:swizzledSelector];
         }
-        
-        if ([uiApplicationDelegate respondsToSelector:@selector(applicationWillEnterForeground:)]) {
-            SEL originalSelector = @selector(applicationWillEnterForeground:);
-            SEL swizzledSelector = @selector(blueshift_swizzled_applicationWillEnterForeground:);
-            [self swizzleMethodWithClass:class originalSelector:originalSelector andSwizzledSelector:swizzledSelector];
-        } else {
-            SEL originalSelector = @selector(applicationWillEnterForeground:);
-            SEL swizzledSelector = @selector(blueshift_swizzled_no_applicationWillEnterForeground:);
-            [self swizzleMethodWithClass:class originalSelector:originalSelector andSwizzledSelector:swizzledSelector];
-        }
-        
-        if ([uiApplicationDelegate respondsToSelector:@selector(applicationDidEnterBackground:)]) {
-            SEL originalSelector = @selector(applicationDidEnterBackground:);
-            SEL swizzledSelector = @selector(blueshift_swizzled_applicationDidEnterBackground:);
-            [self swizzleMethodWithClass:class originalSelector:originalSelector andSwizzledSelector:swizzledSelector];
-        } else {
-            SEL originalSelector = @selector(applicationDidEnterBackground:);
-            SEL swizzledSelector = @selector(blueshift_swizzled_no_applicationDidEnterBackground:);
-            [self swizzleMethodWithClass:class originalSelector:originalSelector andSwizzledSelector:swizzledSelector];
-        }
     });
 }
 
@@ -258,27 +238,6 @@
     if([[BlueShift sharedInstance] isBlueshiftUniversalLinkURL:userActivity.webpageURL] == YES) {
         [[BlueShift sharedInstance].appDelegate handleBlueshiftUniversalLinksForURL:userActivity.webpageURL];
     }
-}
-
-#pragma mark - Application lifecycle methods
-- (void)blueshift_swizzled_applicationWillEnterForeground:(UIApplication *)application {
-    [self blueshift_swizzled_applicationWillEnterForeground:application];
-    
-    [[BlueShift sharedInstance].appDelegate appDidBecomeActive:application];
-}
-
-- (void)blueshift_swizzled_no_applicationWillEnterForeground:(UIApplication *)application {
-    [[BlueShift sharedInstance].appDelegate appDidBecomeActive:application];
-}
-
-- (void)blueshift_swizzled_applicationDidEnterBackground:(UIApplication *)application {
-    [self blueshift_swizzled_applicationDidEnterBackground:application];
-    
-    [[BlueShift sharedInstance].appDelegate appDidEnterBackground:application];
-}
-
-- (void)blueshift_swizzled_no_applicationDidEnterBackground:(UIApplication *)application {
-    [[BlueShift sharedInstance].appDelegate appDidEnterBackground:application];
 }
 
 @end

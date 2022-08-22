@@ -107,6 +107,15 @@ Blueshift.prototype.removeUserInfo = function () {
 };
 
 /**
+* Reset the UUID type of  device id. 
+* This method will only work if the device id type is set as UUID for iOS and GUID for Android. 
+* It will not work for other device id types.
+*/
+Blueshift.prototype.resetDeviceId = function () {
+    cordova.exec(null, null, 'Blueshift', 'resetDeviceId', []);
+};
+
+/**
 * Calls Blueshift's live content API with email and given slot name and live content context.
 * 
 * @param {String} slot slot name of the live content.
@@ -181,8 +190,9 @@ Blueshift.prototype.enableInApp = function (enabled) {
 
 /**
  * Register for remote notifications using SDK. Calling this method will show push permission dialogue to the user.
- * Note - This is only applicable for the iOS devices.
- */
+ * 
+ * Android: Requires Android 13 or above and the 'android.permission.POST_NOTIFICATIONS' permission added in the AndroidManifest.xml file.
+*/
 Blueshift.prototype.registerForRemoteNotification = function () {
     cordova.exec(null, null, 'Blueshift', 'registerForRemoteNotification', []);
 };

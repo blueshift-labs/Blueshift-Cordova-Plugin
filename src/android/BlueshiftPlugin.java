@@ -9,9 +9,12 @@ import android.util.Log;
 
 import com.blueshift.Blueshift;
 import com.blueshift.BlueshiftAppPreferences;
+import com.blueshift.BlueshiftConstants;
 import com.blueshift.BlueshiftLinksHandler;
 import com.blueshift.BlueshiftLinksListener;
 import com.blueshift.BlueshiftLogger;
+import com.blueshift.BlueshiftRegion;
+import com.blueshift.BuildConfig;
 import com.blueshift.inappmessage.InAppApiCallback;
 import com.blueshift.model.Configuration;
 import com.blueshift.model.UserInfo;
@@ -63,6 +66,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_BULK_EVENT_JOB_ID = "com.blueshift.config.bulk_event_job_id";
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
     private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.debug_logs_enabled";
+    private static final String BLUESHIFT_PREF_REGION = "com.blueshift.config.region";
 
     // JS Event Names for DeepLink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
@@ -72,6 +76,9 @@ public class BlueshiftPlugin extends CordovaPlugin {
     // JS Event Params for DeepLink
     private static final String DEEP_LINK = "deepLink";
     private static final String ERROR = "error";
+
+    // TODO: 18/08/22 Change this on each plugin release
+    private static final String CDV_PLUGIN_VERSION = "0.0.3";
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
@@ -196,6 +203,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         Configuration config = new Configuration();
 
         setApiKey(config);
+        setBlueshiftRegion(config);
         setAppIcon(config);
         setPushEnabled(config);
         setInAppEnabled(config);
@@ -481,6 +489,28 @@ public class BlueshiftPlugin extends CordovaPlugin {
         }
     }
 
+    private void setBlueshiftRegion(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_REGION)) {
+            String region = this.preferences.getString(BLUESHIFT_PREF_REGION, "US");
+            if (region != null) {
+                if (region.isEmpty()) {
+                    log("Empty region name provided. Using the default value: US.");
+                } else {
+                    try {
+                        BlueshiftRegion bsftRegion = BlueshiftRegion.valueOf(region);
+                        configuration.setRegion(bsftRegion);
+                    } catch (Exception e) {
+                        log("Invalid region name provided: " + region + ". Supported values are: US, EU.");
+                    }
+                }
+            }
+
+            logPreferenceValue(BLUESHIFT_PREF_REGION, region);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_REGION);
+        }
+    }
+
     private void setLoggingStatus() {
         if (this.preferences.contains(BLUESHIFT_PREF_LOGGING_ENABLED)) {
             mLoggingEnabled = this.preferences.getBoolean(BLUESHIFT_PREF_LOGGING_ENABLED, false);
@@ -562,9 +592,15 @@ public class BlueshiftPlugin extends CordovaPlugin {
                 case "getEnableTrackingStatus":
                     return getEnableTrackingStatus(callbackContext);
 
-                // OTHER GETTERS
+                // DEVICE ID
                 case "getCurrentDeviceId":
                     return getCurrentDeviceId(callbackContext);
+                case "resetDeviceId":
+                    return resetDeviceId();
+
+                // PUSH
+                case "registerForRemoteNotification":
+                    return requestPushNotificationPermission();
 
                 default:
                     log("Unknown action. " + action);
@@ -686,6 +722,14 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
+    private boolean resetDeviceId() {
+        log("resetDeviceId: ");
+
+        Blueshift.resetDeviceId(mAppContext);
+
+        return true;
+    }
+
     private boolean registerForInAppMessages(JSONArray args) throws JSONException {
         String screenName = args.getString(0);
         mBlueshift.registerForInAppMessages(cordova.getActivity(), screenName);
@@ -728,9 +772,20 @@ public class BlueshiftPlugin extends CordovaPlugin {
         return true;
     }
 
+    private JSONObject appendVersion(JSONObject jsonObject) {
+        if (jsonObject == null) jsonObject = new JSONObject();
+        String version = BuildConfig.SDK_VERSION + "-CD-" + CDV_PLUGIN_VERSION;
+        try {
+            jsonObject.put(BlueshiftConstants.KEY_SDK_VERSION, version);
+        } catch (JSONException ignore) {
+        }
+
+        return jsonObject;
+    }
+
     private boolean trackCustomEvent(JSONArray args) throws JSONException {
         String eventName = args.getString(0);
-        JSONObject extras = getJSONObject(args, 1);
+        JSONObject extras = appendVersion(getJSONObject(args, 1));
         boolean canBatch = args.getBoolean(2);
 
         log("trackCustomEvent: {\"event\":\"" + eventName + "\", \"extras\": " + extras + ", \"canBatch\": " + canBatch + "}");
@@ -742,7 +797,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private boolean identify(JSONArray args) throws JSONException {
         String eventName = "identify";
-        JSONObject extras = getJSONObject(args, 0);
+        JSONObject extras = appendVersion(getJSONObject(args, 0));
         boolean canBatch = args.getBoolean(1);
 
         HashMap<String, Object> additionalArgs = new HashMap<>();
@@ -907,6 +962,12 @@ public class BlueshiftPlugin extends CordovaPlugin {
         log("enableInApp: {\"enabled\":" + isEnabled + "}");
         BlueshiftAppPreferences.getInstance(cordova.getContext()).setEnableInApp(isEnabled);
         BlueshiftAppPreferences.getInstance(cordova.getContext()).save(cordova.getContext());
+
+        return true;
+    }
+
+    private boolean requestPushNotificationPermission() {
+        Blueshift.requestPushNotificationPermission(cordova.getActivity());
 
         return true;
     }

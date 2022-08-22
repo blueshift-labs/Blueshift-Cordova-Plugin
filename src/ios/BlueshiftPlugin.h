@@ -5,6 +5,7 @@
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
 #define BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION @"BlueshiftHandleDeepLinkNotification"
+#define kBlueshiftCordovaSDKVersion            @"0.0.3"
 
 #import <BlueShift_iOS_SDK/BlueShift.h>
 
@@ -27,6 +28,9 @@
 - (void)setUserInfoLastName:(CDVInvokedUrlCommand*)command;
 - (void)setUserInfoExtras:(CDVInvokedUrlCommand*)command;
 - (void)removeUserInfo:(CDVInvokedUrlCommand*)command;
+
+// Reset Device id
+- (void)resetDeviceId:(CDVInvokedUrlCommand*)command;
 
 // Manage SDK features
 - (void)enableTracking:(CDVInvokedUrlCommand*)command;
