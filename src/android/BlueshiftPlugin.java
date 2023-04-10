@@ -78,7 +78,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String ERROR = "error";
 
     // TODO: 18/08/22 Change this on each plugin release
-    private static final String CDV_PLUGIN_VERSION = "0.0.3";
+    private static final String CDV_PLUGIN_VERSION = "0.1.0";
 
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
