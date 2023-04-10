@@ -5,7 +5,7 @@
 //  Created by Ketan Shikhare on 15/03/21.
 //  Copyright Blueshift 2021. All rights reserved.
 #define BLUESHIFT_HANDLE_DEEPLINK_NOTIFICATION @"BlueshiftHandleDeepLinkNotification"
-#define kBlueshiftCordovaSDKVersion            @"0.0.3"
+#define kBlueshiftCordovaSDKVersion            @"0.1.0"
 
 #import <BlueShift_iOS_SDK/BlueShift.h>
 

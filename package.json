@@ -1,6 +1,6 @@
 {
   "name": "blueshift-cordova-plugin",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Blueshift Cordova Plugin",
   "cordova": {
     "id": "blueshift-cordova-plugin",

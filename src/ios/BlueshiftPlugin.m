@@ -54,7 +54,7 @@
 static NSString* launchPushNotificationAdditionalInfo = nil;
 static NSString* universalLinkAdditionalInfo = nil;
 
-static dispatch_queue_t bsft_serial_queue() {
+static dispatch_queue_t bsft_serial_queue(void) {
     static dispatch_queue_t bsft_serial_queue;
     static dispatch_once_t s_done;
     dispatch_once(&s_done, ^{
