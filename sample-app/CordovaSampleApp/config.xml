@@ -38,5 +38,5 @@
     <preference name="com.blueshift.config.sdk_coredata_files_location" value="Library"/>
     <preference name="allowFileAccessFromFileURLs" value="true" />
     <preference name="allowUniversalAccessFromFileURLs" value="true" />
-    <preference name="com.blueshift.config.debug_logs_enabled" value="true"/>
+    <preference name="com.blueshift.config.user_info_encryption_enabled" value="true"/>
 </widget>
