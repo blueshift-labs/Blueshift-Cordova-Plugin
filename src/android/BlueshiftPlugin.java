@@ -493,8 +493,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
 
     private void setUserInfoEncryptionEnabled(Configuration configuration) {
         if (this.preferences.contains(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED)) {
-            String status = this.preferences.getString(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED, null);
-            if (status != null) configuration.setSaveUserInfoAsEncrypted(status);
+            boolean status = this.preferences.getBoolean(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED, false);
+            configuration.setSaveUserInfoAsEncrypted(status);
 
             logPreferenceValue(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED, status);
         } else {
