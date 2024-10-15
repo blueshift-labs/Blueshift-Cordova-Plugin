@@ -67,6 +67,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private static final String BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID = "com.blueshift.config.network_change_job_id";
     private static final String BLUESHIFT_PREF_LOGGING_ENABLED = "com.blueshift.config.debug_logs_enabled";
     private static final String BLUESHIFT_PREF_REGION = "com.blueshift.config.region";
+    private static final String BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED = "com.blueshift.config.user_info_encryption_enabled";
 
     // JS Event Names for DeepLink
     private static final String ON_BLUESHIFT_DEEP_LINK_REPLAY_START = "OnBlueshiftDeepLinkReplayStart";
@@ -224,6 +225,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         setAutoAppOpenInterval(config);
         setBulkEventJobId(config);
         setNetworkChangeJobId(config);
+        setUserInfoEncryptionEnabled(config);
 
         mBlueshift.initialize(config);
     }
@@ -486,6 +488,17 @@ public class BlueshiftPlugin extends CordovaPlugin {
             logPreferenceValue(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID, jobId);
         } else {
             logMissingPreference(BLUESHIFT_PREF_NETWORK_CHANGE_JOB_ID);
+        }
+    }
+
+    private void setUserInfoEncryptionEnabled(Configuration configuration) {
+        if (this.preferences.contains(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED)) {
+            boolean status = this.preferences.getBoolean(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED, false);
+            configuration.setSaveUserInfoAsEncrypted(status);
+
+            logPreferenceValue(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED, status);
+        } else {
+            logMissingPreference(BLUESHIFT_PREF_USER_INFO_ENCRYPTION_ENABLED);
         }
     }
 

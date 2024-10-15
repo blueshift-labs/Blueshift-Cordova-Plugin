@@ -53,7 +53,7 @@
     <platform name="android">
         <!-- CLI variables for accepting API key and optional lib versions. -->
         <preference name="BSFT_EVENT_API_KEY" />
-        <preference name="BSFT_SDK_VERSION" default="3.3.0"/>
+        <preference name="BSFT_SDK_VERSION" default="3.5.1"/>
         <preference name="GSON_VERSION" default="2.8.9"/>
         <preference name="FIREBASE_CORE_VERSION" default="17.4.4"/>
         <preference name="FIREBASE_MESSAGING_VERSION" default="20.3.0"/>
