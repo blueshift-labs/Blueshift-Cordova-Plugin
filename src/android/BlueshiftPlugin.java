@@ -28,8 +28,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,6 +86,8 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private Context mAppContext = null;
     private Blueshift mBlueshift = null;
     private boolean mLoggingEnabled = false;
+    private boolean mDeviceReady = false;
+    private final List<String> jsEventsCache = new ArrayList<>();
 
     private int getColorResourceId(String colorName) {
         return getResourceIdFromString(colorName, "color");
@@ -100,6 +104,30 @@ public class BlueshiftPlugin extends CordovaPlugin {
                 mAppContext.getPackageName());
     }
 
+    private void dispatchAllCachedEvents() {
+        synchronized (jsEventsCache) {
+            if (!jsEventsCache.isEmpty()) {
+                for (String jsCode : jsEventsCache) {
+                    log("Device is ready. Dispatching cached event >> " + jsCode);
+                    webView.getView().post(() -> webView.loadUrl(jsCode));
+                }
+                jsEventsCache.clear();
+            }
+        }
+    }
+
+    private void dispatchEvent(CordovaWebView webView, String jsCode) {
+        if (mDeviceReady) {
+            log("Device is ready. Dispatching event >> " + jsCode);
+            webView.getView().post(() -> webView.loadUrl(jsCode));
+        } else {
+            log("Device is NOT ready. Caching event >> " + jsCode);
+            synchronized (jsEventsCache) {
+                jsEventsCache.add(jsCode);
+            }
+        }
+    }
+
     private String documentEventJs(String event, String json) {
         log("fireDocumentEvent: event_name: " + event + ", extra_json:" + json);
         return "javascript:cordova.fireDocumentEvent('" + event + "'," + json + ");";
@@ -108,7 +136,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
     private void dispatchDeepLinkReplayStartEvent(CordovaWebView webView) {
         if (webView != null) {
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_START, "{}");
-            webView.getView().post(() -> webView.loadUrl(jsCode));
+            dispatchEvent(webView, jsCode);
         }
     }
 
@@ -116,7 +144,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (webView != null) {
             String json = "{'" + DEEP_LINK + "':'" + deeplink + "'}";
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_SUCCESS, json);
-            webView.getView().post(() -> webView.loadUrl(jsCode));
+            dispatchEvent(webView, jsCode);
         }
     }
 
@@ -124,7 +152,7 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (webView != null) {
             String json = "{'" + DEEP_LINK + "':'" + deeplink + "', '" + ERROR + "':'" + error + "'}";
             String jsCode = documentEventJs(ON_BLUESHIFT_DEEP_LINK_REPLAY_FAIL, json);
-            webView.getView().post(() -> webView.loadUrl(jsCode));
+            dispatchEvent(webView, jsCode);
         }
     }
 
@@ -177,6 +205,16 @@ public class BlueshiftPlugin extends CordovaPlugin {
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             handleDeepLinks(intent);
         }
+    }
+
+    @Override
+    public Object onMessage(String id, Object data) {
+        if ("onPageFinished".equals(id)) {
+            mDeviceReady = true;
+            dispatchAllCachedEvents();
+        }
+
+        return super.onMessage(id, data);
     }
 
     @Override
